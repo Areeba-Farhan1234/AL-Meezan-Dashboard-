@@ -13,7 +13,6 @@ export const rootPaths = {
 };
 
 const paths = {
-  // Dashboard & Core Pages
   dashboard: `/${rootPaths.pageRoot}/dashboard`,
 
   // Dashboard Subpages
