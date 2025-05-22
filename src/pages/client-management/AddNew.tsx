@@ -1,235 +1,3 @@
-// pages / AddClients.tsx;
-// import React, { useState } from 'react';
-// import { useClients } from '../../context/ClientsContext';
-// import {
-//   TextField,
-//   Button,
-//   Container,
-//   Grid,
-//   Typography,
-//   Box,
-//   MenuItem,
-//   Select,
-//   InputLabel,
-//   FormControl,
-// } from '@mui/material';
-
-// import { v4 as uuidv4 } from 'uuid';
-// import { useTheme } from '@mui/material/styles';
-// import { useNavigate } from 'react-router-dom';
-
-// const AddClients: React.FC = () => {
-//   const { addClient } = useClients();
-//   const [value, setValue] = useState('');
-
-//   const handleChange = (e) => {
-//     setValue(e.target.value);
-//   };
-//   const theme = useTheme();
-//   const navigate = useNavigate();
-
-//   const [clientData, setClientData] = useState({
-//     name: '',
-//     email: '',
-//     contact: '',
-//     address: '',
-//     vat_number: '',
-//     entity_type: '',
-//     business_type: '',
-//     emirates: '',
-//     location: '',
-//     upcoming_due: '',
-//   });
-
-//   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const { name, value } = e.target;
-//     setClientData((prev) => ({ ...prev, [name]: value }));
-//   };
-
-//   const handleSubmit = (e: React.FormEvent) => {
-//     e.preventDefault();
-
-//     const newClient = {
-//       ...clientData,
-//       id: uuidv4(), // Generates a unique UUID
-//     };
-
-//     addClient(newClient);
-//     navigate('/all-clients');
-//   };
-
-//   return (
-//     <Container maxWidth="md">
-//       <Box mt={4}>
-//         <Typography variant="h4" gutterBottom>
-//           Add Client
-//         </Typography>
-//         <form onSubmit={handleSubmit}>
-//           <Grid container spacing={2}>
-//             {/* Name Field */}
-//             {/* <Grid item xs={12} sm={6}>
-//               <TextField
-//                 label="Name"
-//                 variant="outlined"
-//                 fullWidth
-//                 name="name"
-//                 value={clientData.name}
-//                 onChange={handleChange}
-//                 required
-//                 InputProps={{
-//                   style: {
-//                     backgroundColor: theme.palette.info.main,
-//                   },
-//                 }}
-//               />
-//             </Grid> */}
-//             {/* Email Field */}
-//             {/* <Grid item xs={12} sm={6}>
-//               <TextField
-//                 label="Email"
-//                 variant="outlined"
-//                 fullWidth
-//                 type="email"
-//                 name="email"
-//                 value={clientData.email}
-//                 onChange={handleChange}
-//                 required
-//               />
-//             </Grid> */}
-//             {/* Contact Field */}
-//             {/* <Grid item xs={12} sm={6}>
-//               <TextField
-//                 label="Contact"
-//                 variant="outlined"
-//                 fullWidth
-//                 name="contact"
-//                 value={clientData.contact}
-//                 onChange={handleChange}
-//                 required
-//               />
-//             </Grid> */}
-//             {/* Address Field */}
-//             {/* <Grid item xs={12} sm={6}>
-//               <TextField
-//                 label="Address"
-//                 variant="outlined"
-//                 fullWidth
-//                 name="address"
-//                 value={clientData.address}
-//                 onChange={handleChange}
-//                 required
-//               />
-//             </Grid> */}
-//             {/* VAT Number Field */}
-//             {/* <Grid item xs={12} sm={6}>
-//               <TextField
-//                 label="VAT Number"
-//                 variant="outlined"
-//                 fullWidth
-//                 type="number"
-//                 name="vat_number"
-//                 value={clientData.vat_number}
-//                 onChange={handleChange}
-//                 required
-//               />
-//             </Grid> */}
-
-//             {/* Entity Type */}
-//             <Grid item xs={12} sm={6}>
-//               <FormControl fullWidth>
-//                 <InputLabel>Entity Type</InputLabel>
-//                 <Select
-//                   name="entity_type"
-//                   value={clientData.entity_type}
-//                   onChange={handleChange}
-//                   required
-//                 >
-//                   <MenuItem value="Legal Person">Legal Person</MenuItem>
-//                   <MenuItem value="Natural Person">Natural Person</MenuItem>
-//                 </Select>
-//               </FormControl>
-//             </Grid>
-
-//             {/* Business Type */}
-//             <Grid item xs={12} sm={6}>
-//               <FormControl fullWidth>
-//                 <InputLabel>Business Type</InputLabel>
-//                 <Select
-//                   name="business_type"
-//                   value={clientData.business_type}
-//                   onChange={handleChange}
-//                   required
-//                 >
-//                   <MenuItem value="Jewellery">Jewellery</MenuItem>
-//                   <MenuItem value="Real Estate">Real Estate</MenuItem>
-//                   <MenuItem value="General Trading">General Trading</MenuItem>
-//                 </Select>
-//               </FormControl>
-//             </Grid>
-
-//             {/* Emirates */}
-//             <Grid item xs={12} sm={6}>
-//               <FormControl fullWidth>
-//                 <InputLabel>Emirates</InputLabel>
-//                 <Select
-//                   name="emirates"
-//                   value={clientData.emirates}
-//                   onChange={handleChange}
-//                   required
-//                 >
-//                   <MenuItem value="Abu Dhabi">Abu Dhabi</MenuItem>
-//                   <MenuItem value="Dubai">Dubai</MenuItem>
-//                   <MenuItem value="Sharjah">Sharjah</MenuItem>
-//                   <MenuItem value="Ajman">Ajman</MenuItem>
-//                   <MenuItem value="Umm al Quwain">Umm al Quwain</MenuItem>
-//                   <MenuItem value="Ras Al Khaimah">Ras Al Khaimah</MenuItem>
-//                   <MenuItem value="Fujairah">Fujairah</MenuItem>
-//                 </Select>
-//               </FormControl>
-//             </Grid>
-
-//             {/* Location */}
-//             <Grid item xs={12} sm={6}>
-//               <FormControl fullWidth>
-//                 <InputLabel>Location</InputLabel>
-//                 <Select
-//                   name="location"
-//                   value={clientData.location}
-//                   onChange={handleChange}
-//                   required
-//                 >
-//                   <MenuItem value="Free Zone">Free Zone</MenuItem>
-//                   <MenuItem value="Main Land">Main Land</MenuItem>
-//                 </Select>
-//               </FormControl>
-//             </Grid>
-
-//             {/* Upcoming Due */}
-//             <Grid item xs={12} sm={6}>
-//               <FormControl fullWidth>
-//                 <InputLabel>Upcoming Due</InputLabel>
-//                 <Select name="upcoming_due" value={clientData.upcoming_due} onChange={handleChange}>
-//                   <MenuItem value="VAT Due">VAT Due</MenuItem>
-//                   <MenuItem value="CT Due">CT Due</MenuItem>
-//                 </Select>
-//               </FormControl>
-//             </Grid>
-
-//             {/* Submit Button */}
-//             <Grid item xs={12}>
-//               <Button variant="contained" color="primary" type="submit">
-//                 Add Client
-//               </Button>
-//             </Grid>
-//           </Grid>
-//         </form>
-//       </Box>
-//     </Container>
-//   );
-// };
-
-// export default AddClients;
-
 import React, { useState } from 'react';
 import { useClients } from '../../context/ClientsContext';
 import {
@@ -241,7 +9,6 @@ import {
   Box,
   MenuItem,
   Select,
-  InputLabel,
   FormControl,
 } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
@@ -267,7 +34,6 @@ const AddClients: React.FC = () => {
   const { addClient } = useClients();
   const theme = useTheme();
   const navigate = useNavigate();
-  const [emailError, setEmailError] = useState('');
   const [clientData, setClientData] = useState<ClientFormData>({
     name: '',
     email: '',
@@ -463,20 +229,8 @@ const AddClients: React.FC = () => {
                 type="email"
                 name="email"
                 value={clientData.email}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  handleChange(e);
-
-                  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                  if (value && !emailPattern.test(value)) {
-                    setEmailError('Invalid email address');
-                  } else {
-                    setEmailError('');
-                  }
-                }}
+                onChange={handleChange}
                 required
-                error={Boolean(emailError)}
-                helperText={emailError}
                 InputProps={{
                   style: {
                     backgroundColor: theme.palette.info.main,
@@ -504,19 +258,16 @@ const AddClients: React.FC = () => {
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Upcoming Due</InputLabel>
+              <FormControl fullWidth required>
                 <Select
                   name="upcoming_due"
                   value={clientData.upcoming_due}
                   onChange={handleChange}
-                  sx={{
-                    '& .MuiSelect-select': {
-                      marginBottom: '5px',
-                      marginTop: '6px',
-                    },
-                  }}
+                  displayEmpty
                 >
+                  <MenuItem value="" disabled>
+                    Upcoming Due Dates
+                  </MenuItem>
                   <MenuItem value="VAT Due">VAT Due</MenuItem>
                   <MenuItem value="CT Due">CT Due</MenuItem>
                 </Select>
