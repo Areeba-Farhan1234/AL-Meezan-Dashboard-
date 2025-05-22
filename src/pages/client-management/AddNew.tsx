@@ -9,7 +9,6 @@ import {
   Box,
   MenuItem,
   Select,
-  InputLabel,
   FormControl,
 } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
@@ -35,7 +34,6 @@ const AddClients: React.FC = () => {
   const { addClient } = useClients();
   const theme = useTheme();
   const navigate = useNavigate();
-  const [emailError, setEmailError] = useState('');
   const [clientData, setClientData] = useState<ClientFormData>({
     name: '',
     email: '',
@@ -231,20 +229,8 @@ const AddClients: React.FC = () => {
                 type="email"
                 name="email"
                 value={clientData.email}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  handleChange(e);
-
-                  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                  if (value && !emailPattern.test(value)) {
-                    setEmailError('Invalid email address');
-                  } else {
-                    setEmailError('');
-                  }
-                }}
+                onChange={handleChange}
                 required
-                error={Boolean(emailError)}
-                helperText={emailError}
                 InputProps={{
                   style: {
                     backgroundColor: theme.palette.info.main,
@@ -272,19 +258,16 @@ const AddClients: React.FC = () => {
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Upcoming Due</InputLabel>
+              <FormControl fullWidth required>
                 <Select
                   name="upcoming_due"
                   value={clientData.upcoming_due}
                   onChange={handleChange}
-                  sx={{
-                    '& .MuiSelect-select': {
-                      marginBottom: '5px',
-                      marginTop: '6px',
-                    },
-                  }}
+                  displayEmpty
                 >
+                  <MenuItem value="" disabled>
+                    Upcoming Due Dates
+                  </MenuItem>
                   <MenuItem value="VAT Due">VAT Due</MenuItem>
                   <MenuItem value="CT Due">CT Due</MenuItem>
                 </Select>
