@@ -21,14 +21,8 @@ interface MenuItems {
 }
 
 const menuItems: MenuItems[] = [
-  // {
-  //   id: 1,
-  //   title: 'Account Settings',
-  //   icon: 'ic:outline-manage-accounts',
-  //   path: paths.accountSettings,
-  // },
   {
-    id: 2,
+    id: 1,
     title: 'Logout',
     icon: 'ic:baseline-logout',
   },

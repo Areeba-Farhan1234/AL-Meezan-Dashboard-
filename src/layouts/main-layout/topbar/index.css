@@ -2,3 +2,7 @@ body.dark-mode {
   background-color: #121212;
   color: white;
 }
+
+.notification-list .dropdown-item {
+  transition: background 0.2s ease-in-out;
+}
