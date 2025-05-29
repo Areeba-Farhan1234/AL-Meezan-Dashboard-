@@ -259,10 +259,11 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
-import { useClients, Client } from '..//../context/ClientsContext';
+import { useClients, Client } from '../../context/ClientsContext';
+import axios from 'axios';
 
 const ClientsList: React.FC = () => {
-  const { clients, deleteClient, updateClient } = useClients();
+  const { clients, updateClient, setClients } = useClients();
   const navigate = useNavigate();
 
   // Drag to scroll
@@ -319,10 +320,16 @@ const ClientsList: React.FC = () => {
     setEditedClient({});
   };
 
-  // Delete client
-  const handleDelete = async (id: string | number) => {
-    if (window.confirm('Are you sure you want to delete this client?')) {
-      await deleteClient(id);
+  const handleDeleteClient = async (id: string | number) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this client?');
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`http://localhost:8000/api/clients/${id}`);
+      setClients((prevClients) => prevClients.filter((client) => client.id !== id));
+    } catch (error) {
+      console.error('Error deleting client:', error);
+      alert('Failed to delete the client. Please try again.');
     }
   };
 
@@ -458,7 +465,6 @@ const ClientsList: React.FC = () => {
                                           : 'text'
                                     }
                                     value={
-                                      // Use editedClient's value or empty string fallback
                                       editedClient[key] !== undefined && editedClient[key] !== null
                                         ? String(editedClient[key])
                                         : ''
@@ -470,7 +476,8 @@ const ClientsList: React.FC = () => {
                                       }))
                                     }
                                     style={{ width: '100%', padding: '4px 6px' }}
-                                    autoFocus={key === fields[0].key} // autofocus first input
+                                    autoFocus={key === fields[0].key}
+                                    title={`Enter ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
                                   />
                                 ) : (
                                   client[key]
@@ -514,11 +521,9 @@ const ClientsList: React.FC = () => {
                                   <EditIcon />
                                 </IconButton>
                                 <IconButton
-                                  onClick={() => handleDelete(client.id)}
                                   aria-label="delete"
-                                  size="small"
-                                  color="error"
-                                  disabled={editingClientId !== null}
+                                  onClick={() => handleDeleteClient(client.id)}
+                                  disabled={editingClientId !== null} // prevent deletion while editing
                                 >
                                   <DeleteIcon />
                                 </IconButton>
