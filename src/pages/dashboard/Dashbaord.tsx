@@ -1,10 +1,9 @@
 import Grid from '@mui/material/Grid';
 import { useNavigate } from 'react-router-dom';
 import TopCards from 'components/sections/dashboard/top-cards';
-import TotalSpent from 'components/sections/dashboard/total-spent';
-import SpentThisMonth from 'components/sections/dashboard/spent-this-month';
-import Tasks from 'components/sections/dashboard/tasks';
-import TransactionHistory from 'components/sections/dashboard/transaction-history';
+import Document from 'components/sections/dashboard/Document/DocumentDownload';
+
+// import TransactionHistory from 'components/sections/dashboard/transaction-history/TransactionHistoryTable';
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -22,21 +21,13 @@ const Dashboard: React.FC = () => {
         <TopCards />
       </Grid>
 
-      <Grid item xs={12} md={8}>
-        <TotalSpent />
+      <Grid item xs={12}>
+        <Document />
       </Grid>
 
-      <Grid item xs={12} md={4}>
-        <SpentThisMonth />
-      </Grid>
-
-      <Grid item xs={12} md={4}>
-        <Tasks />
-      </Grid>
-
-      <Grid item xs={12} md={8}>
+      {/* <Grid item xs={12} md={8}>
         <TransactionHistory />
-      </Grid>
+      </Grid> */}
     </Grid>
   );
 };

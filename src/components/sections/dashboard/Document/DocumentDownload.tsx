@@ -1,13 +1,3 @@
-// import {FC} from 'react'
-
-// const AddNew:FC = () => {
-//   return (
-//     <div>AddNew</div>
-//   )
-// }
-
-// export default AddNew
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -68,16 +58,25 @@ const DocumentPage: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="md">
+    <Container maxWidth="xl">
+      {/* Upload File Section */}
       <Box
         mt={5}
-        p={4}
+        p={6}
         textAlign="center"
-        sx={{ border: '2px dashed #a5d8ff', borderRadius: '12px' }}
+        sx={{
+          border: '2px dashed #3e4095',
+          borderRadius: '12px',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          boxSizing: 'border-box',
+        }}
       >
-        <Description sx={{ fontSize: 50, color: '#1e88e5' }} />
+        <Description sx={{ fontSize: 50, color: '#3e4095' }} />
         <Typography variant="body1">Drag and drop PDF, Excel, or CSV file here</Typography>
-        <Button variant="contained" component="label" sx={{ mt: 2, backgroundColor: '#1e88e5' }}>
+        <Button variant="contained" component="label" sx={{ mt: 2, backgroundColor: '#3e4095' }}>
           Upload file
           <input
             hidden
@@ -91,17 +90,17 @@ const DocumentPage: React.FC = () => {
         </Typography>
       </Box>
 
-      <Box mt={5}>
+      {/* Recent Documents Section */}
+      <Box mt={5} mb={10} width="100%">
         <Typography variant="h6" gutterBottom>
           Recent Documents
         </Typography>
-        <Paper elevation={1}>
+        <Paper elevation={1} sx={{ width: '100%', overflowX: 'auto' }}>
           <Table>
             <TableHead>
               <TableRow>
                 <TableCell>Document Name</TableCell>
                 <TableCell>Created On</TableCell>
-
                 <TableCell>Status</TableCell>
               </TableRow>
             </TableHead>
@@ -118,7 +117,6 @@ const DocumentPage: React.FC = () => {
                     <Typography>{doc.createdBy}</Typography>
                     <Typography variant="caption">{doc.createdOn}</Typography>
                   </TableCell>
-
                   <TableCell>
                     <Chip label={doc.status} color="info" sx={{ fontWeight: 'bold' }} />
                   </TableCell>

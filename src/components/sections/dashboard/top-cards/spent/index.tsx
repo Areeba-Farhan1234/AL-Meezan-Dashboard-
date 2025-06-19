@@ -9,10 +9,10 @@ const Spent = () => {
     <Paper component={Stack} alignItems="center" justifyContent="space-between" sx={{ py: 2.5 }}>
       <Box>
         <Typography variant="body2" color="text.disabled" fontWeight={500}>
-          Spent this month
+          All Cients Forms
         </Typography>
         <Typography mt={1} variant="h3">
-          $682.5
+          282.5
         </Typography>
       </Box>
 

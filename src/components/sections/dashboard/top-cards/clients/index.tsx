@@ -28,7 +28,7 @@ const Clients = () => {
         </Stack>
         <Box>
           <Typography variant="body2" color="text.disabled" fontWeight={500}>
-            New clients
+            New Clients
           </Typography>
           <Typography mt={0.5} variant="h4">
             321

@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { useTheme } from '@mui/material/styles';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
@@ -23,10 +24,11 @@ import autoTable from 'jspdf-autotable';
 import { VatForm } from 'context/VATContext';
 
 const VatRegistration: React.FC = () => {
+  const theme = useTheme();
   const [data, setData] = useState<VatForm[]>([]);
   const [approvalDate, setApprovalDate] = useState<Dayjs | null>(null);
-  const [emailError, setEmailError] = useState('');
   const [filter, setFilter] = useState({ clientname: '', from: '', to: '', reportType: '' });
+  const [timeRange, setTimeRange] = useState<'3months' | 'all'>('3months');
 
   const [formDetail, setFormDetail] = useState({
     clientname: '',
@@ -38,6 +40,8 @@ const VatRegistration: React.FC = () => {
     password: '',
     comment: '',
     entity_type: '',
+    theme: '',
+    vatname: '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -50,15 +54,51 @@ const VatRegistration: React.FC = () => {
     setFormDetail((prev) => ({ ...prev, [name]: value }));
   };
 
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   // Format approvalDate safely
+  //   const formattedApprovalDate = approvalDate ? approvalDate.format('YYYY-MM-DD') : '';
+  //   const dataToSubmit = {
+  //     approvaldate: formattedApprovalDate,
+  //   };
+
+  //   try {
+  //     const res = await axios.post('http://localhost:5000/vat', dataToSubmit);
+
+  //     alert('Client registered successfully!');
+  //     console.log(res.data);
+  //     fetchData();
+
+  //     setFormDetail({
+  //       clientname: '',
+  //       threshold: '',
+  //       docstatus: '',
+  //       approvaldate: '',
+  //       returnperiod: '',
+  //       email: '',
+  //       password: '',
+  //       comment: '',
+  //       entity_type: '',
+  //     });
+  //     setApprovalDate(null);
+  //   } catch (err) {
+  //     console.error('Error submitting form:', err);
+  //     alert('Submission failed.');
+  //   }
+  // };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const formattedApprovalDate = approvalDate ? approvalDate.format('YYYY-MM-DD') : '';
+
     const dataToSubmit = {
       ...formDetail,
-      approvaldate: approvalDate ? approvalDate.format('YYYY-MM-DD') : '',
+      approvaldate: formattedApprovalDate,
     };
 
     try {
-      const res = await axios.post('http://localhost:5000/vat', dataToSubmit);
+      const res = await axios.post('/vat', dataToSubmit);
       alert('Client registered successfully!');
       console.log(res.data);
       fetchData();
@@ -73,9 +113,10 @@ const VatRegistration: React.FC = () => {
         password: '',
         comment: '',
         entity_type: '',
+        theme: '',
+        vatname: '',
       });
       setApprovalDate(null);
-      setEmailError('');
     } catch (err) {
       console.error('Error submitting form:', err);
       alert('Submission failed.');
@@ -96,24 +137,62 @@ const VatRegistration: React.FC = () => {
   }, []);
 
   const filteredData = data.filter((item) => {
-    const matchClient = item.Vatname?.toLowerCase().includes(filter.clientname.toLowerCase());
+    const matchClient = item.clientname?.toLowerCase().includes(filter.clientname.toLowerCase());
     const matchType = filter.reportType ? item.entity_type === filter.reportType : true;
-    const matchFrom = filter.from
-      ? new Date(item.approvaldate || '') >= new Date(filter.from)
-      : true;
-    const matchTo = filter.to ? new Date(item.approvaldate || '') <= new Date(filter.to) : true;
+
+    const fromDate = filter.from ? new Date(filter.from) : null;
+    let toDate: Date | null = null;
+
+    if (filter.to) {
+      // If both from and to are provided
+      toDate = new Date(filter.to);
+    } else if (fromDate) {
+      // If only from is provided, add 1 month
+      toDate = new Date(fromDate);
+      toDate.setMonth(toDate.getMonth() + 1);
+    }
+
+    const itemDate = new Date(item.approvaldate || '');
+
+    const matchFrom = fromDate ? itemDate >= fromDate : true;
+    const matchTo = toDate ? itemDate <= toDate : true;
+
     return matchClient && matchType && matchFrom && matchTo;
   });
 
   const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(filteredData);
+    const dataWithSerial = filteredData.map((item, index) => ({
+      ID: index + 1,
+      ClientName: item.clientname || '',
+      Email: item.email || '',
+      Threshold: item.threshold || '',
+      ApprovalDate: item.approvaldate ? dayjs(item.approvaldate).format('YYYY-MM-DD') : '',
+      ReturnPeriod: item.returnperiod || '',
+      EntityType: item.entity_type || '',
+      Comment: item.comment || '',
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataWithSerial);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'VAT Clients');
     XLSX.writeFile(workbook, 'VAT_Clients.xlsx');
   };
 
   const exportToCSV = () => {
-    const csvContent = XLSX.utils.sheet_to_csv(XLSX.utils.json_to_sheet(filteredData));
+    const dataWithSerial = filteredData.map((item, index) => ({
+      ID: index + 1,
+      ClientName: item.clientname || '',
+      Email: item.email || '',
+      Threshold: item.threshold || '',
+      ApprovalDate: item.approvaldate ? dayjs(item.approvaldate).format('YYYY-MM-DD') : '',
+      ReturnPeriod: item.returnperiod || '',
+      EntityType: item.entity_type || '',
+      Comment: item.comment || '',
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataWithSerial);
+    const csvContent = XLSX.utils.sheet_to_csv(worksheet);
+
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -124,18 +203,43 @@ const VatRegistration: React.FC = () => {
   };
 
   const exportToPDF = () => {
-    const doc = new jsPDF();
+    const doc = new jsPDF({ orientation: 'landscape' });
+
     autoTable(doc, {
-      head: [['Client Name', 'Email', 'Threshold']],
-      body: filteredData.map((d) => [d.Vatname || '', d.email || '', d.threshold || '']),
+      head: [
+        [
+          'S. No.',
+          'Client Name',
+          'Email',
+          'Threshold',
+          'Approval Date',
+          'Return Period',
+          'Entity Type',
+          'Comment',
+        ],
+      ],
+      body: filteredData.map((item, index) => [
+        index + 1,
+        item.clientname || '',
+        item.email || '',
+        item.threshold || '',
+        item.approvaldate ? dayjs(item.approvaldate).format('YYYY-MM-DD') : '',
+        item.returnperiod || '',
+        item.entity_type || '',
+        item.comment || '',
+      ]),
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [22, 160, 133] },
+      margin: { top: 20 },
     });
+
     doc.save('VAT_Clients.pdf');
   };
 
   return (
     <Container maxWidth="md">
-      <Box mt={4} p={4} sx={{ backgroundColor: '#fff', borderRadius: 2, boxShadow: 4 }}>
-        <Typography variant="h4" sx={{ mb: 3 }} gutterBottom>
+      <Box mt={4} mb={6} p={4} sx={{ backgroundColor: '#fff', borderRadius: 2, boxShadow: 4 }}>
+        <Typography variant="h3" marginBottom="10px" gutterBottom>
           VAT Registration
         </Typography>
 
@@ -144,14 +248,17 @@ const VatRegistration: React.FC = () => {
           <Typography variant="h6" gutterBottom>
             Filter VAT Clients
           </Typography>
+
           <Grid container spacing={2}>
             <Grid item xs={12} sm={4}>
               <TextField
-                label="Client Name"
+                placeholder="Client Name"
                 name="clientname"
                 value={filter.clientname}
                 onChange={(e) => setFilter({ ...filter, clientname: e.target.value })}
                 fullWidth
+                required
+                InputProps={{ style: { backgroundColor: theme.palette.info.main } }}
               />
             </Grid>
             <Grid item xs={12} sm={4}>
@@ -196,7 +303,7 @@ const VatRegistration: React.FC = () => {
               <ul>
                 {filteredData.map((client, idx) => (
                   <li key={idx}>
-                    {client.Vatname} — {client.threshold}
+                    {client.clientname} — {client.threshold}
                   </li>
                 ))}
               </ul>
@@ -209,12 +316,13 @@ const VatRegistration: React.FC = () => {
           <Grid container spacing={3}>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Client Name"
+                placeholder="Client Name"
                 name="clientname"
                 value={formDetail.clientname}
                 onChange={handleChange}
                 fullWidth
                 required
+                InputProps={{ style: { backgroundColor: theme.palette.info.main } }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -267,63 +375,150 @@ const VatRegistration: React.FC = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Return Period"
+                placeholder="Return Period"
                 name="returnperiod"
                 value={formDetail.returnperiod}
                 onChange={handleChange}
                 fullWidth
                 required
+                InputProps={{ style: { backgroundColor: theme.palette.info.main } }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Email"
+                placeholder="Email"
                 name="email"
                 type="email"
                 value={formDetail.email}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  handleChange(e);
-                  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                  setEmailError(value && !emailPattern.test(value) ? 'Invalid email address' : '');
-                }}
+                onChange={handleChange}
                 fullWidth
                 required
-                error={!!emailError}
-                helperText={emailError}
+                InputProps={{ style: { backgroundColor: theme.palette.info.main } }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Password"
+                placeholder="Password"
                 name="password"
                 type="password"
                 value={formDetail.password}
                 onChange={handleChange}
                 fullWidth
                 required
+                InputProps={{ style: { backgroundColor: theme.palette.info.main } }}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Comment"
+                placeholder="Comment"
                 name="comment"
                 value={formDetail.comment}
                 onChange={handleChange}
                 fullWidth
+                InputProps={{ style: { backgroundColor: theme.palette.info.main } }}
               />
             </Grid>
+            <Grid item xs={12} sm={4}>
+              <FormControl fullWidth>
+                <Select
+                  value={timeRange}
+                  onChange={(e) => setTimeRange(e.target.value as '3months' | 'all')}
+                  displayEmpty
+                >
+                  <MenuItem value="3months">Last 3 Months</MenuItem>
+                  <MenuItem value="all">All</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <FormControl fullWidth required>
+                <Select
+                  name="entity_type"
+                  value={formDetail.entity_type}
+                  onChange={handleSelectChange}
+                  displayEmpty
+                >
+                  <MenuItem value="" disabled>
+                    Select Entity Type
+                  </MenuItem>
+                  <MenuItem value="Company">Company</MenuItem>
+                  <MenuItem value="Individual">Individual</MenuItem>
+                  <MenuItem value="Partnership">Partnership</MenuItem>
+                  <MenuItem value="Other">Other</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
             <Grid item xs={12} textAlign="right">
-              <Button variant="contained" onClick={exportToCSV} sx={{ mr: 2 }}>
+              <Button
+                variant="contained"
+                onClick={exportToCSV}
+                sx={{
+                  backgroundColor: 'primary.main',
+                  color: '#fff',
+                  mr: 2,
+                  '&:hover': {
+                    backgroundColor: '#fff',
+                    color: 'primary.main',
+                    border: '2px solid',
+                    borderColor: 'primary.main',
+                    boxShadow: 4,
+                  },
+                }}
+              >
                 Export CSV
               </Button>
-              <Button variant="contained" onClick={exportToExcel} sx={{ mr: 2 }}>
+              <Button
+                variant="contained"
+                onClick={exportToExcel}
+                sx={{
+                  backgroundColor: 'primary.main',
+                  color: '#fff',
+                  mr: 2,
+                  '&:hover': {
+                    backgroundColor: '#fff',
+                    color: 'primary.main',
+                    border: '2px solid',
+                    borderColor: 'primary.main',
+                    boxShadow: 4,
+                  },
+                }}
+              >
                 Export Excel
               </Button>
-              <Button variant="contained" onClick={exportToPDF} sx={{ mr: 2 }}>
+              <Button
+                variant="contained"
+                onClick={exportToPDF}
+                sx={{
+                  backgroundColor: 'primary.main',
+                  color: '#fff',
+                  mr: 2,
+                  '&:hover': {
+                    backgroundColor: '#fff',
+                    color: 'primary.main',
+                    border: '2px solid',
+                    borderColor: 'primary.main',
+                    boxShadow: 4,
+                  },
+                }}
+              >
                 Export PDF
               </Button>
-              <Button type="submit" variant="contained">
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  backgroundColor: 'primary.main',
+                  color: '#fff',
+
+                  '&:hover': {
+                    backgroundColor: '#fff',
+                    color: 'primary.main',
+                    border: '2px solid',
+                    borderColor: 'primary.main',
+                    boxShadow: 4,
+                  },
+                }}
+              >
                 Submit
               </Button>
             </Grid>

@@ -11,7 +11,6 @@ import PageLoader from 'components/loader/PageLoader';
 const App = lazy(() => import('App'));
 const Dashboard = lazy(() => import('pages/dashboard/Dashbaord'));
 const Clients = lazy(() => import('pages/dashboard/Clients'));
-// const AccountSettings = lazy(() => import('layouts/main-layout/topbar/Profile/AccountSettings'));
 const Logout = lazy(() => import('layouts/main-layout/topbar/Profile/Logout'));
 const PendingTasks = lazy(() => import('pages/dashboard/PendingTasks'));
 const UpcomingDeadlines = lazy(() => import('pages/dashboard/UpcomingDeadlines'));
@@ -109,10 +108,7 @@ const router = createBrowserRouter(
               path: paths.clients,
               element: <Clients />,
             },
-            // {
-            //   path: paths.accountSettings,
-            //   element: <AccountSettings />,
-            // },
+
             {
               path: paths.logout,
               element: <Logout />,

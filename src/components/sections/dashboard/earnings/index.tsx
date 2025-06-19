@@ -22,17 +22,20 @@ const Earnings = () => {
       </Stack>
 
       <Typography variant="body2" textAlign="center" color="text.disabled" fontWeight={500}>
-        This month earnings
+        Notifications
       </Typography>
       <Typography mt={0.5} variant="h2" textAlign="center" color="text.primary">
-        $682.5
+        22{' '}
       </Typography>
 
       <Stack mt={2} justifyContent="center">
         <Chip label="+2.45%" color="success" />
       </Stack>
 
-      <EarningsChart data={[20, 30, 50, 45, 60, 20, 40, 50, 30, 60, 40, 50, 20, 45, 30]} sx={{ width: 1, height: '220px !important' }} />
+      <EarningsChart
+        data={[20, 30, 50, 45, 60, 20, 40, 50, 30, 60, 40, 50, 20, 45, 30]}
+        sx={{ width: 1, height: '220px !important' }}
+      />
     </Paper>
   );
 };
