@@ -25,10 +25,10 @@ const Earnings = () => {
         </Stack>
         <Box>
           <Typography variant="body2" color="text.disabled" fontWeight={500}>
-            Earnings
+            Notifications
           </Typography>
           <Typography mt={1} variant="h3">
-            $350.40
+            22
           </Typography>
         </Box>
       </Stack>

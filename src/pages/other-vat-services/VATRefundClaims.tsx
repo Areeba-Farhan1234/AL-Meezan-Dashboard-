@@ -8,6 +8,7 @@ import {
   Select,
   Typography,
   Box,
+  Button,
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { useTheme } from '@mui/material/styles';
@@ -16,7 +17,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 const VATRefundClaims: React.FC = () => {
   const theme = useTheme();
-  const [emailError, setEmailError] = useState('');
 
   const [formRefund, setFormRefund] = useState({
     clientname: '',
@@ -31,13 +31,6 @@ const VATRefundClaims: React.FC = () => {
     comment: '',
     status: '',
   });
-
-  // const handleSelectChange = (e: React.ChangeEvent<{ name?: string; value: unknown }>) => {
-  //   const { name, value } = e.target;
-  //   if (name) {
-  //     setFormDetail((prev) => ({ ...prev, [name]: value as string }));
-  //   }
-  // };
 
   const handleSelectChange = (e: SelectChangeEvent) => {
     const { name, value } = e.target;
@@ -68,7 +61,7 @@ const VATRefundClaims: React.FC = () => {
           // height: '600px',
         }}
       >
-        <Typography variant="h3" sx={{ mb: 3 }} gutterBottom>
+        <Typography variant="h3" marginBottom="10px" gutterBottom>
           VAT Refund
         </Typography>
 
@@ -190,15 +183,8 @@ const VATRefundClaims: React.FC = () => {
                 type="email"
                 name="email"
                 value={formRefund.email}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  handleChange(e);
-                  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                  setEmailError(value && !emailPattern.test(value) ? 'Invalid email address' : '');
-                }}
+                onChange={handleChange}
                 required
-                error={Boolean(emailError)}
-                helperText={emailError}
                 InputProps={{ style: { backgroundColor: theme.palette.info.main } }}
               />
             </Grid>
@@ -235,6 +221,12 @@ const VATRefundClaims: React.FC = () => {
                   },
                 }}
               />
+            </Grid>
+
+            <Grid item xs={2} textAlign="right">
+              <Button type="submit" variant="contained">
+                Submit
+              </Button>
             </Grid>
           </Grid>
         </form>

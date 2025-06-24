@@ -57,7 +57,6 @@ const VATDeRegistration: React.FC = () => {
     comment: '',
   });
   const [reportData, setReportData] = useState<VATReport[]>([]);
-  const [emailError, setEmailError] = useState('');
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
@@ -135,22 +134,6 @@ const VATDeRegistration: React.FC = () => {
     }, 100);
   };
 
-  // const exportToPDF = () => {
-  //   setTimeout(() => {
-  //     const input = document.getElementById('reportTable');
-  //     if (!input) return;
-  //     html2canvas(input).then((canvas) => {
-  //       const imgData = canvas.toDataURL('image/png');
-  //       const pdf = new jsPDF();
-  //       const imgProps = jsPDF.getImageProperties(imgData);
-  //       const pdfWidth = pdf.internal.pageSize.getWidth();
-  //       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-  //       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-  //       pdf.save('VATDeReg_Report.pdf');
-  //     });
-  //   }, 100);
-  // };
-
   const exportToPDF = () => {
     setTimeout(() => {
       const input = document.getElementById('reportTable');
@@ -174,8 +157,8 @@ const VATDeRegistration: React.FC = () => {
 
   return (
     <Container maxWidth="md">
-      <Box mt={4} p={4} sx={{ backgroundColor: '#fff', borderRadius: 2, boxShadow: 4 }}>
-        <Typography variant="h4" gutterBottom>
+      <Box mt={4} mb={6} p={4} sx={{ backgroundColor: '#fff', borderRadius: 2, boxShadow: 4 }}>
+        <Typography variant="h3" marginBottom="10px" gutterBottom>
           VAT Deregistration
         </Typography>
 
@@ -271,16 +254,9 @@ const VATDeRegistration: React.FC = () => {
                 type="email"
                 name="email"
                 value={formDereg.email}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  handleChange(e);
-                  const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                  setEmailError(value && !pattern.test(value) ? 'Invalid email address' : '');
-                }}
+                onChange={handleChange}
                 fullWidth
                 required
-                error={Boolean(emailError)}
-                helperText={emailError}
                 InputProps={{ style: { backgroundColor: theme.palette.info.main } }}
               />
             </Grid>
@@ -312,18 +288,77 @@ const VATDeRegistration: React.FC = () => {
               />
             </Grid>
 
-            <Grid item xs={12}>
-              <Button variant="contained" color="primary" type="submit">
-                Submit Form
-              </Button>
-              <Button variant="contained" onClick={exportToCSV}>
+            <Grid item xs={12} textAlign="right">
+              <Button
+                variant="contained"
+                onClick={exportToCSV}
+                sx={{
+                  backgroundColor: 'primary.main',
+                  color: '#fff',
+                  mr: 2,
+                  '&:hover': {
+                    backgroundColor: '#fff',
+                    color: 'primary.main',
+                    border: '2px solid',
+                    borderColor: 'primary.main',
+                    boxShadow: 4,
+                  },
+                }}
+              >
                 Export CSV
               </Button>
-              <Button variant="contained" onClick={exportToExcel}>
+              <Button
+                variant="contained"
+                onClick={exportToExcel}
+                sx={{
+                  backgroundColor: 'primary.main',
+                  color: '#fff',
+                  mr: 2,
+                  '&:hover': {
+                    backgroundColor: '#fff',
+                    color: 'primary.main',
+                    border: '2px solid',
+                    borderColor: 'primary.main',
+                    boxShadow: 4,
+                  },
+                }}
+              >
                 Export Excel
               </Button>
-              <Button variant="contained" onClick={exportToPDF}>
+              <Button
+                variant="contained"
+                onClick={exportToPDF}
+                sx={{
+                  backgroundColor: 'primary.main',
+                  color: '#fff',
+                  mr: 2,
+                  '&:hover': {
+                    backgroundColor: '#fff',
+                    color: 'primary.main',
+                    border: '2px solid',
+                    borderColor: 'primary.main',
+                    boxShadow: 4,
+                  },
+                }}
+              >
                 Export PDF
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  backgroundColor: 'primary.main',
+                  color: '#fff',
+                  '&:hover': {
+                    backgroundColor: '#fff',
+                    color: 'primary.main',
+                    border: '2px solid',
+                    borderColor: 'primary.main',
+                    boxShadow: 4,
+                  },
+                }}
+              >
+                Submit
               </Button>
             </Grid>
           </Grid>

@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Define the Client interface
 export interface Client {
-  id: number | string;
+  _id: number | string;
   name: string;
   email: string;
   vat_number: string;
@@ -20,7 +20,7 @@ export interface Client {
 interface ClientsContextType {
   clients: Client[];
   setClients: React.Dispatch<React.SetStateAction<Client[]>>;
-  addClient: (client: Omit<Client, 'id'>) => Promise<void>;
+  addClient: (client: Omit<Client, '_id'>) => Promise<void>;
   deleteClient: (id: number | string) => Promise<void>;
   updateClient: (id: number | string, updatedClient: Partial<Client>) => Promise<void>;
 }
@@ -35,7 +35,7 @@ export const ClientsProvider: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const response = await axios.get<Client[]>('http://localhost:5000/clients');
+        const response = await axios.get<Client[]>('/clients');
         setClients(response.data);
       } catch (error) {
         console.error('Error fetching clients:', error);
@@ -45,9 +45,9 @@ export const ClientsProvider: React.FC<{ children: React.ReactNode }> = ({ child
     fetchClients();
   }, []);
 
-  const addClient = async (client: Omit<Client, 'id'>) => {
+  const addClient = async (client: Omit<Client, '_id'>) => {
     try {
-      const response = await axios.post<Client>('http://localhost:5000/clients', client);
+      const response = await axios.post<Client>('/clients', client);
       setClients((prev) => [...prev, response.data]);
     } catch (error) {
       console.error('Error adding client:', error);
@@ -56,8 +56,8 @@ export const ClientsProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const deleteClient = async (id: number | string) => {
     try {
-      await axios.delete(`http://localhost:5000/clients/${id}`);
-      setClients((prev) => prev.filter((client) => client.id !== id));
+      await axios.delete(`/clients/${id}`);
+      setClients((prev) => prev.filter((client) => client._id !== id));
     } catch (error) {
       console.error('Error deleting client:', error);
     }
@@ -65,13 +65,11 @@ export const ClientsProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const updateClient = async (id: number | string, updatedClient: Partial<Client>) => {
     try {
-      const response = await axios.patch<Client>(`http://localhost:5000/clients/${id}`, updatedClient);
+      const response = await axios.patch<Client>(`/clients/${id}`, updatedClient);
       setClients((prev) =>
         prev.map((client) =>
-          client.id.toString() === id.toString()
-            ? { ...client, ...response.data }
-            : client
-        )
+          client._id.toString() === id.toString() ? { ...client, ...response.data } : client,
+        ),
       );
     } catch (error) {
       console.error('Error updating client:', error);
@@ -79,9 +77,7 @@ export const ClientsProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   return (
-    <ClientsContext.Provider
-      value={{ clients, setClients, addClient, deleteClient, updateClient }}
-    >
+    <ClientsContext.Provider value={{ clients, setClients, addClient, deleteClient, updateClient }}>
       {children}
     </ClientsContext.Provider>
   );

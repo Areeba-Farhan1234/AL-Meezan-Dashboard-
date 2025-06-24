@@ -16,9 +16,9 @@ const DrawerItems = () => {
   return (
     <>
       <Stack
-        pt={2}
-        pb={0.5}
-        px={3.5}
+        pt={2.5}
+        pb={1.5}
+        px={2.5}
         fontSize="16px"
         position="sticky"
         top={0}
@@ -44,10 +44,12 @@ const DrawerItems = () => {
         sx={{
           mt: 0.5,
           mb: 0.5,
-          px: 3.5,
+          pl: 1,
+          pr: 1.5,
           '& .MuiTypography-root': {
             whiteSpace: 'nowrap',
             overflow: 'hidden',
+            width: '100%',
             textOverflow: 'ellipsis',
           },
         }}

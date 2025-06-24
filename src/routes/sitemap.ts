@@ -165,30 +165,30 @@ const sitemap: MenuItem[] = [
       },
     ],
   },
-  {
-    id: 'document-management',
-    subheader: 'Document Management',
-    icon: 'ri:file-list-3-line',
-    path: paths.myDocuments,
-    items: [
-      {
-        name: 'My Documents',
-        pathName: 'my-documents',
-        path: paths.myDocuments,
-      },
-      {
-        name: 'Add New',
-        pathName: 'add-new',
-        path: paths.documentAddNew,
-      },
-    ],
-  },
-  {
-    id: 'analytics',
-    subheader: 'Analytics',
-    icon: 'ri:bar-chart-2-line',
-    path: paths.analytics,
-  },
+  // {
+  //   id: 'document-management',
+  //   subheader: 'Document Management',
+  //   icon: 'ri:file-list-3-line',
+  //   path: paths.myDocuments,
+  //   items: [
+  //     {
+  //       name: 'My Documents',
+  //       pathName: 'my-documents',
+  //       path: paths.myDocuments,
+  //     },
+  //     {
+  //       name: 'Add New',
+  //       pathName: 'add-new',
+  //       path: paths.documentAddNew,
+  //     },
+  //   ],
+  // },
+  // {
+  //   id: 'analytics',
+  //   subheader: 'Analytics',
+  //   icon: 'ri:bar-chart-2-line',
+  //   path: paths.analytics,
+  // },
 ];
 
 export default sitemap;
