@@ -25,7 +25,7 @@ import { CssBaseline } from '@mui/material';
 import router from 'routes/router';
 import { theme } from 'theme/theme.ts';
 import { ClientsProvider } from './context/ClientsContext';
-import { VATDeregistrationProvider } from './context/VATDeregContext';
+import { VatDeregProvider } from './context/VATDeregContext';
 
 import './index.css';
 
@@ -34,9 +34,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <ClientsProvider>
-        <VATDeregistrationProvider>
+        <VatDeregProvider>
           <RouterProvider router={router} />
-        </VATDeregistrationProvider>
+        </VatDeregProvider>
       </ClientsProvider>
     </ThemeProvider>
   </React.StrictMode>,

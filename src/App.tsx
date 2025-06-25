@@ -30,19 +30,17 @@
 // export default App;
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { ClientsProvider } from './context/VATContext';
-// import { VatDeregProvider } from './context/VATDeregContext';
-// import { RefundClaimProvider } from './context/VATRefundContext';
+// import { ClientsProvider } from './context/VATContext';
+import { VatDeregProvider } from './context/VATDeregContext';
+import { RefundProvider } from './context/RefundContext';
 
 const App: React.FC = () => {
   return (
-    <ClientsProvider>
-      {/* <VatDeregProvider>
-        <RefundClaimProvider> */}
-      <Outlet />
-      {/* </RefundClaimProvider>
-      </VatDeregProvider> */}
-    </ClientsProvider>
+    <VatDeregProvider>
+      <RefundProvider>
+        <Outlet />
+      </RefundProvider>
+    </VatDeregProvider>
   );
 };
 

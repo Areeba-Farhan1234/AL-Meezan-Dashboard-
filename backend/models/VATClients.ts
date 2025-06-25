@@ -119,7 +119,6 @@
 
 // module.exports = mongoose.model('VATclient', VATclientSchema);
 
-
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IVATclient extends Document {

@@ -6,10 +6,8 @@ export const rootPaths = {
   clientRoot: 'clients',
   amlRoot: 'aml',
   vatRoot: 'vat',
-  reportsRoot: 'reports',
+  listRoot: 'list',
   notificationsRoot: 'notifications',
-  documentsRoot: 'documents',
-  analyticsRoot: 'analytics',
 };
 
 const paths = {
@@ -31,37 +29,29 @@ const paths = {
   clients: `/${rootPaths.clientRoot}`,
   clientAllClients: `/${rootPaths.clientRoot}/all-clients`,
   clientAddNew: `/${rootPaths.clientRoot}/add-new`,
-  // clientUpdate: (id: string | number) => `/${rootPaths.clientRoot}/update/${id}`,
-  // clientDelete: (id: string | number) => `/${rootPaths.clientRoot}/delete/${id}`,
+  clientUpdate: (id: string | number) => `/${rootPaths.clientRoot}/update/${id}`,
+  clientDelete: (id: string | number) => `/${rootPaths.clientRoot}/delete/${id}`,
 
   // AML Compliance Bar
   kycForm: `/${rootPaths.amlRoot}/kyc-form`,
   tradeWiseCompliance: `/${rootPaths.amlRoot}/trade-wise-compliance`,
   authorityWiseCompliance: `/${rootPaths.amlRoot}/authority-wise-compliance`,
 
-  // Other VAT Services
+  // VAT Form
   vatRegistration: `/${rootPaths.vatRoot}/vat-registration`,
   vatDeRegistration: `/${rootPaths.vatRoot}/vat-de-registration`,
   vatRefundClaims: `/${rootPaths.vatRoot}/vat-refund-claims`,
   vatReconsiderationRequests: `/${rootPaths.vatRoot}/vat-reconsideration-requests`,
   vatInquiriesComplains: `/${rootPaths.vatRoot}/vat-inquiries-complains`,
 
-  // Reports
-  allReports: `/${rootPaths.reportsRoot}/all-reports`,
-  generateNewReport: `/${rootPaths.reportsRoot}/generate-new`,
-  exportReports: `/${rootPaths.reportsRoot}/export`,
+  // VAT Form List
+  vatRegistrationList: `/${rootPaths.listRoot}/all-reports`,
+  vatDeRegistrationList: `/${rootPaths.listRoot}/generate-new`,
+  vatRefundClaimsList: `/${rootPaths.listRoot}/export`,
 
   // Notifications
-  vatDeadline: `/${rootPaths.notificationsRoot}/vat-deadline`,
-  clientFollowUps: `/${rootPaths.notificationsRoot}/client-follow-ups`,
+  Notifications: `/${rootPaths.notificationsRoot}/notifications`,
 
-  // Document Management
-  myDocuments: `/${rootPaths.documentsRoot}/my-documents`,
-  documentAddNew: `/${rootPaths.documentsRoot}/add-new`,
-
-  // Analytics
-  analytics: `/${rootPaths.analyticsRoot}`,
-  // accountSettings: `/${rootPaths.pageRoot}/dashboard/account-settings`,
   logout: `/${rootPaths.authRoot}/dashboard/logout`,
 };
 
