@@ -71,7 +71,7 @@ const sitemap: MenuItem[] = [
   {
     id: 'aml-compliance-bar',
     subheader: 'AML Compliance Bar',
-    icon: 'ri:apps-2-line',
+    icon: 'ri:file-chart-line',
     path: paths.kycForm,
     items: [
       {
@@ -92,8 +92,8 @@ const sitemap: MenuItem[] = [
     ],
   },
   {
-    id: 'other-vat-services',
-    subheader: 'Other VAT Services',
+    id: 'vat-form',
+    subheader: 'VAT Form',
     icon: 'ri:apps-2-line',
     path: paths.vatRegistration,
     items: [
@@ -125,25 +125,25 @@ const sitemap: MenuItem[] = [
     ],
   },
   {
-    id: 'reports',
-    subheader: 'Reports',
-    icon: 'ri:file-chart-line',
-    path: paths.allReports,
+    id: 'vat-form-list',
+    subheader: 'VAT Form List',
+    icon: 'ri:apps-2-line',
+    path: paths.vatDeRegistrationList,
     items: [
       {
-        name: 'All Reports',
-        pathName: 'all-reports',
-        path: paths.allReports,
+        name: 'VAT Registration List',
+        pathName: 'vat-registration-list',
+        path: paths.vatRegistrationList,
       },
       {
-        name: 'Generate New',
-        pathName: 'generate-new',
-        path: paths.generateNewReport,
+        name: 'VAT De-Registration List',
+        pathName: 'vat-de-registration-list',
+        path: paths.vatDeRegistrationList,
       },
       {
-        name: 'Export',
-        pathName: 'export',
-        path: paths.exportReports,
+        name: 'VAT Refund Claims List',
+        pathName: 'vat-refund-claims-list',
+        path: paths.vatRefundClaimsList,
       },
     ],
   },
@@ -151,44 +151,15 @@ const sitemap: MenuItem[] = [
     id: 'notifications',
     subheader: 'Notifications',
     icon: 'ri:notification-3-line',
-    path: paths.vatDeadline,
+    path: paths.Notifications,
     items: [
       {
-        name: 'VAT Deadline',
-        pathName: 'vat-deadline',
-        path: paths.vatDeadline,
-      },
-      {
-        name: 'Client Follow-ups',
-        pathName: 'client-follow-ups',
-        path: paths.clientFollowUps,
+        name: 'All Notifications',
+        pathName: 'notifications',
+        path: paths.Notifications,
       },
     ],
   },
-  // {
-  //   id: 'document-management',
-  //   subheader: 'Document Management',
-  //   icon: 'ri:file-list-3-line',
-  //   path: paths.myDocuments,
-  //   items: [
-  //     {
-  //       name: 'My Documents',
-  //       pathName: 'my-documents',
-  //       path: paths.myDocuments,
-  //     },
-  //     {
-  //       name: 'Add New',
-  //       pathName: 'add-new',
-  //       path: paths.documentAddNew,
-  //     },
-  //   ],
-  // },
-  // {
-  //   id: 'analytics',
-  //   subheader: 'Analytics',
-  //   icon: 'ri:bar-chart-2-line',
-  //   path: paths.analytics,
-  // },
 ];
 
 export default sitemap;

@@ -130,6 +130,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import vatRoutes from './routes/vat';
 import clientRoutes from './routes/clients'; // Assuming you created a routes/client.ts
+import deregRoutes from './routes/vatdereg';
+import refundRoutes from './routes/vatrefund';
 
 dotenv.config();
 
@@ -155,6 +157,8 @@ mongoose
 // Use external routes
 app.use('/', vatRoutes); // All VAT routes
 app.use('/clients', clientRoutes); // All client routes
+app.use('/dereg', deregRoutes);
+app.use('/refund', refundRoutes);
 
 // Start server
 app.listen(PORT, () => {

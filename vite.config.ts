@@ -48,6 +48,8 @@ export default defineConfig({
     proxy: {
       '/clients': 'http://localhost:5000',
       '/vat': 'http://localhost:5000',
+      '/dereg': 'http://localhost:5000',
+      '/refund': 'http://localhost:5000',
     },
   },
   preview: {

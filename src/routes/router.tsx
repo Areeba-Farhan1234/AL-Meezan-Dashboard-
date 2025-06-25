@@ -23,25 +23,17 @@ const KYCForm = lazy(() => import('pages/aml-compliance/KYCForm'));
 const TradeWiseCompliance = lazy(() => import('pages/aml-compliance/TradeWiseCompliance'));
 const AuthorityWiseCompliance = lazy(() => import('pages/aml-compliance/AuthorityWiseCompliance'));
 
-const VATRegistration = lazy(() => import('pages/other-vat-services/VATRegistration'));
-const VATDeRegistration = lazy(() => import('pages/other-vat-services/VATDeRegistration'));
-const VATRefundClaims = lazy(() => import('pages/other-vat-services/VATRefundClaims'));
-const VATReconsiderationRequests = lazy(
-  () => import('pages/other-vat-services/VATReconsiderationRequests'),
-);
-const VATInquiriesComplains = lazy(() => import('pages/other-vat-services/VATInquiriesComplains'));
+const VATRegistration = lazy(() => import('pages/vat-form/VATRegistration'));
+const VATDeRegistration = lazy(() => import('pages/vat-form/VATDeRegistration'));
+const VATRefundClaims = lazy(() => import('pages/vat-form/VATRefundClaims'));
+const VATReconsiderationRequests = lazy(() => import('pages/vat-form/VATReconsiderationRequests'));
+const VATInquiriesComplains = lazy(() => import('pages/vat-form/VATInquiriesComplains'));
 
-const AllReports = lazy(() => import('pages/reports/AllReports'));
-const GenerateNewReport = lazy(() => import('pages/reports/GenerateNew'));
-const ExportReports = lazy(() => import('pages/reports/Export'));
+const VATRegistrationList = lazy(() => import('pages/vat-form-list/VATRegistrationList'));
+const VATDeRegistrationList = lazy(() => import('pages/vat-form-list/VATDeRegistrationList'));
+const VATRefundClaimsList = lazy(() => import('pages/vat-form-list/VATRefundClaimsList'));
 
-const VATDeadline = lazy(() => import('pages/notifications/VATDeadline'));
-const ClientFollowUps = lazy(() => import('pages/notifications/ClientFollowUps'));
-
-const MyDocuments = lazy(() => import('pages/document-management/MyDocuments'));
-const AddDocument = lazy(() => import('pages/document-management/AddNew'));
-
-const Analytics = lazy(() => import('pages/analytics/Analytics'));
+const Notifications = lazy(() => import('pages/notifications/Notifications'));
 
 const Signin = lazy(() => import('pages/authentication/Signin'));
 
@@ -65,14 +57,13 @@ const router = createBrowserRouter(
         </Suspense>
       ),
       children: [
-        // Redirect root path to signin
         {
           path: '/',
           element: <Navigate to="/auth/signin" replace />,
         },
-        // Auth Routes
+
         {
-          path: rootPaths.authRoot, // e.g., '/auth'
+          path: rootPaths.authRoot,
           element: (
             <AuthLayout>
               <Suspense fallback={<PageLoader />}>
@@ -87,9 +78,9 @@ const router = createBrowserRouter(
             },
           ],
         },
-        // Protected Dashboard Routes
+
         {
-          path: rootPaths.root, // e.g., '/dashboard'
+          path: rootPaths.root,
           element: (
             <PrivateRoute>
               <MainLayout>
@@ -166,36 +157,20 @@ const router = createBrowserRouter(
               element: <VATInquiriesComplains />,
             },
             {
-              path: paths.allReports,
-              element: <AllReports />,
+              path: paths.vatRegistrationList,
+              element: <VATRegistrationList />,
             },
             {
-              path: paths.generateNewReport,
-              element: <GenerateNewReport />,
+              path: paths.vatDeRegistrationList,
+              element: <VATDeRegistrationList />,
             },
             {
-              path: paths.exportReports,
-              element: <ExportReports />,
+              path: paths.vatRefundClaimsList,
+              element: <VATRefundClaimsList />,
             },
             {
-              path: paths.vatDeadline,
-              element: <VATDeadline />,
-            },
-            {
-              path: paths.clientFollowUps,
-              element: <ClientFollowUps />,
-            },
-            {
-              path: paths.myDocuments,
-              element: <MyDocuments />,
-            },
-            {
-              path: paths.documentAddNew,
-              element: <AddDocument />,
-            },
-            {
-              path: paths.analytics,
-              element: <Analytics />,
+              path: paths.Notifications,
+              element: <Notifications />,
             },
           ],
         },
