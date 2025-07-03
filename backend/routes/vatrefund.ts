@@ -29,6 +29,26 @@ router.post('/', async (req, res) => {
   }
 });
 
+// ✅ PUT (Update)
+router.put('/:id', async (req, res) => {
+  try {
+    const updated = await VatRefund.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ error: 'Failed to update' });
+  }
+});
+
+// ✅ DELETE
+router.delete('/:id', async (req, res) => {
+  try {
+    await VatRefund.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Delete failed' });
+  }
+});
+
 // Export all records as CSV
 router.get('/export/csv', async (req, res) => {
   try {

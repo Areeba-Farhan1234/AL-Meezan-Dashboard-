@@ -29,3 +29,32 @@ const ReactEchart = forwardRef<null | EChartsReactCore, ReactEchartProps>(
 );
 
 export default ReactEchart;
+// import { forwardRef } from 'react';
+// import { Box, BoxProps } from '@mui/material';
+// import { EChartsOption } from 'echarts';
+// import ReactECharts from 'echarts-for-react/lib/core';
+// import { EChartsReactProps } from 'echarts-for-react';
+
+// export interface ReactEchartProps extends BoxProps {
+//   echartsInstance: EChartsReactProps['echarts'];
+//   option: EChartsOption;
+//   style?: React.CSSProperties;
+// }
+
+// const ReactEchart = forwardRef<any, ReactEchartProps>(
+//   ({ echartsInstance, option, style, ...rest }, ref) => (
+//     <Box
+//       component={ReactECharts}
+//       ref={ref}
+//       echarts={echartsInstance}
+//       option={{
+//         ...option,
+//         tooltip: { ...option.tooltip, confine: true },
+//       }}
+//       style={style}
+//       {...rest}
+//     />
+//   ),
+// );
+
+// export default ReactEchart;

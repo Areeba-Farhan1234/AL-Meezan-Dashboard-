@@ -87,7 +87,7 @@ const ClientsList: React.FC = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`http://localhost:5000/clients/${id}`);
+      await axios.delete(`/clients/${id}`);
       setClients((prevClients) => prevClients.filter((client) => client._id !== id));
     } catch (error) {
       console.error('Error deleting client:', error);
@@ -112,9 +112,19 @@ const ClientsList: React.FC = () => {
   return (
     <Container maxWidth="lg" sx={{ mt: 4, position: 'relative' }}>
       <Box>
-        <Typography variant="h3" marginBottom="16px" gutterBottom>
-          Clients List
-        </Typography>
+        <Box mt={4} mb={2}>
+          <Typography variant="h3" marginBottom="16px" gutterBottom>
+            {' '}
+            Clients List
+          </Typography>
+          <Button
+            variant="contained"
+            onClick={() => navigate('vatRefund')}
+            sx={{ background: '#3e4095' }}
+          >
+            + New Entry
+          </Button>
+        </Box>
 
         {clients.length > 0 ? (
           <>

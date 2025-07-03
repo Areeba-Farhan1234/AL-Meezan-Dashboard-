@@ -203,7 +203,7 @@ export const VatDeregProvider = ({ children }: { children: ReactNode }) => {
   // Fetch all VAT deregistration records
   const fetchVatDeregList = async () => {
     try {
-      const response = await axios.get<VatDeregForm[]>('http://localhost:5000/vat-deregistration');
+      const response = await axios.get<VatDeregForm[]>('/dereg');
       setVatDeregList(response.data);
     } catch (error) {
       console.error('Failed to fetch VAT deregistration records:', error);
@@ -213,7 +213,7 @@ export const VatDeregProvider = ({ children }: { children: ReactNode }) => {
   // Delete a record by ID
   const deleteVatDereg = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:5000/vat-deregistration/${id}`);
+      await axios.delete(`/dereg/${id}`);
       setVatDeregList((prev) => prev.filter((item) => item._id !== id));
     } catch (error) {
       console.error('Error deleting VAT deregistration record:', error);
@@ -223,10 +223,7 @@ export const VatDeregProvider = ({ children }: { children: ReactNode }) => {
   // Update a record by ID
   const updateVatDereg = async (id: string, updatedData: VatDeregForm) => {
     try {
-      const response = await axios.patch<VatDeregForm>(
-        `http://localhost:5000/vat-deregistration/${id}`,
-        updatedData,
-      );
+      const response = await axios.patch<VatDeregForm>(`/dereg/${id}`, updatedData);
       setVatDeregList((prev) =>
         prev.map((item) => (item._id === id ? { ...item, ...response.data } : item)),
       );

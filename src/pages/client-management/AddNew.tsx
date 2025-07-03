@@ -11,7 +11,7 @@ import {
   Select,
   FormControl,
 } from '@mui/material';
-import { v4 as uuidv4 } from 'uuid';
+
 import { SelectChangeEvent } from '@mui/material/Select';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
@@ -55,16 +55,17 @@ const AddClients: React.FC = () => {
     setClientData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newClient = {
-      ...clientData,
-      id: uuidv4(),
-    };
-
-    addClient(newClient);
-    navigate('/clients/all-clients');
+    try {
+      // Just send the clientData — no need to generate an id
+      await addClient(clientData); // it will POST and update context inside ClientsProvider
+      navigate('/clients/all-clients');
+    } catch (error) {
+      console.error('Failed to add client:', error);
+      alert('Something went wrong while adding the client.');
+    }
   };
 
   return (
