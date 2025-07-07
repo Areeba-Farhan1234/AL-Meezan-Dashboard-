@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import {
   Container,
@@ -26,6 +26,52 @@ const VatRegistrationList: React.FC = () => {
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
   const navigate = useNavigate();
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [startY, setStartY] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [scrollTop, setScrollTop] = useState(0);
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    setIsDragging(true);
+    document.body.classList.add('dragging');
+    setStartX(e.pageX - containerRef.current.offsetLeft);
+    setStartY(e.pageY - containerRef.current.offsetTop);
+    setScrollLeft(containerRef.current.scrollLeft);
+    setScrollTop(containerRef.current.scrollTop);
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !containerRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - containerRef.current.offsetLeft;
+    const y = e.pageY - containerRef.current.offsetTop;
+    const walkX = x - startX;
+    const walkY = y - startY;
+    containerRef.current.scrollLeft = scrollLeft - walkX;
+    containerRef.current.scrollTop = scrollTop - walkY;
+  };
+
+  const onMouseUp = () => {
+    setIsDragging(false);
+    document.body.classList.remove('dragging');
+  };
+
+  const onMouseLeave = () => {
+    setIsDragging(false);
+    document.body.classList.remove('dragging');
+  };
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const hasAutoScrolled = useRef(false);
+
+  useEffect(() => {
+    if (containerRef.current && !hasAutoScrolled.current) {
+      containerRef.current.scrollLeft = containerRef.current.scrollWidth;
+      hasAutoScrolled.current = true;
+    }
+  }, [data.length]);
 
   const formatDate = (date?: string) => {
     return date ? new Date(date).toLocaleDateString('en-GB') : '';
@@ -94,11 +140,24 @@ const VatRegistrationList: React.FC = () => {
     <Container maxWidth="xl">
       {/* Header */}
       <Box mt={4} mb={2} display="flex" justifyContent="space-between">
-        <Typography variant="h5">VAT Clients List</Typography>
+        <Typography variant="h3" marginBottom="16px" gutterBottom>
+          VAT Registration List
+        </Typography>
         <Button
           variant="contained"
           onClick={() => navigate('/vat/vat-registration')}
-          sx={{ background: '#3e4095' }}
+          sx={{
+            backgroundColor: 'primary.main',
+            color: '#fff',
+            mr: 2,
+            '&:hover': {
+              backgroundColor: '#fff',
+              color: 'primary.main',
+              border: '1px solid',
+              borderColor: 'primary.main',
+              boxShadow: 4,
+            },
+          }}
         >
           + New Entry
         </Button>
@@ -106,15 +165,41 @@ const VatRegistrationList: React.FC = () => {
 
       {/* Table */}
       <Box mt={5}>
-        <Typography variant="h6" gutterBottom>
-          Submitted VAT Records
+        <Typography variant="h5" gutterBottom>
+          Submitted VAT Registration Records
         </Typography>
 
         {currentItems.length === 0 ? (
           <Typography>No records found.</Typography>
         ) : (
-          <Box sx={{ overflowX: 'auto', background: '#fff', borderRadius: '8px', padding: '16px' }}>
-            <table style={{ width: '1200px', minWidth: '1200px', borderCollapse: 'collapse' }}>
+          <Box
+            ref={containerRef}
+            onMouseDown={onMouseDown}
+            onMouseMove={onMouseMove}
+            onMouseUp={onMouseUp}
+            onMouseLeave={onMouseLeave}
+            sx={{
+              overflowX: 'auto',
+              width: '100%',
+              background: '#fff',
+              borderRadius: '8px',
+              padding: '16px',
+              border: '1px solid #ccc',
+              cursor: isDragging ? 'grabbing' : 'grab',
+              userSelect: 'none',
+              '&::-webkit-scrollbar': {
+                height: 8,
+              },
+              '&::-webkit-scrollbar-thumb': {
+                backgroundColor: '#ccc',
+                borderRadius: 2,
+              },
+              '&::-webkit-scrollbar-thumb:hover': {
+                backgroundColor: '#999',
+              },
+            }}
+          >
+            <table style={{ minWidth: '1200px', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: '#f5f5f5' }}>
                   {[
@@ -214,7 +299,18 @@ const VatRegistrationList: React.FC = () => {
       <Box mt={3} display="flex" justifyContent="space-between" alignItems="center">
         <Button
           variant="contained"
-          sx={{ background: '#3e4095' }}
+          sx={{
+            backgroundColor: 'primary.main',
+            color: '#fff',
+            mr: 2,
+            '&:hover': {
+              backgroundColor: '#fff',
+              color: 'primary.main',
+              border: '1px solid',
+              borderColor: 'primary.main',
+              boxShadow: 4,
+            },
+          }}
           disabled={page === 1}
           onClick={() => setPage(page - 1)}
         >
@@ -234,7 +330,18 @@ const VatRegistrationList: React.FC = () => {
 
         <Button
           variant="contained"
-          sx={{ background: '#3e4095' }}
+          sx={{
+            backgroundColor: 'primary.main',
+            color: '#fff',
+            mr: 2,
+            '&:hover': {
+              backgroundColor: '#fff',
+              color: 'primary.main',
+              border: '1px solid',
+              borderColor: 'primary.main',
+              boxShadow: 4,
+            },
+          }}
           disabled={page >= Math.ceil(data.length / itemsPerPage)}
           onClick={() => setPage(page + 1)}
         >

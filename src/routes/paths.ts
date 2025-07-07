@@ -15,7 +15,7 @@ const paths = {
   dashboard: `/${rootPaths.pageRoot}/dashboard`,
 
   // Dashboard Subpages
-  Clients: `/${rootPaths.pageRoot}/dashboard/clients`,
+  // home: `/${rootPaths.pageRoot}/dashboard`,
   pendingTasks: `/${rootPaths.pageRoot}/dashboard/pending-tasks`,
   upcomingDeadlines: `/${rootPaths.pageRoot}/dashboard/upcoming-deadlines`,
   alerts: `/${rootPaths.pageRoot}/dashboard/alerts`,

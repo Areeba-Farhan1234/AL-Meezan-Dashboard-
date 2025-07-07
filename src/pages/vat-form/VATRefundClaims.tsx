@@ -904,7 +904,7 @@ const VATRefundClaims: React.FC = () => {
         <Grid container spacing={2}>
           <Grid item xs={12} sm={3}>
             <TextField
-              label="Client Name"
+              placeholder="Client Name"
               value={filter.clientname}
               onChange={(e) => setFilter((prev) => ({ ...prev, clientname: e.target.value }))}
               fullWidth
@@ -913,20 +913,38 @@ const VATRefundClaims: React.FC = () => {
           <Grid item xs={12} sm={3}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                label="From Date"
                 value={filter.fromDate}
                 onChange={(date) => setFilter((prev) => ({ ...prev, fromDate: date }))}
-                slotProps={{ textField: { fullWidth: true } }}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    InputProps: {
+                      style: {
+                        color: '#3e4095',
+                        fontWeight: '500',
+                      },
+                    },
+                  },
+                }}
               />
             </LocalizationProvider>
           </Grid>
           <Grid item xs={12} sm={3}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                label="To Date"
                 value={filter.toDate}
                 onChange={(date) => setFilter((prev) => ({ ...prev, toDate: date }))}
-                slotProps={{ textField: { fullWidth: true } }}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,
+                    InputProps: {
+                      style: {
+                        color: '#3e4095',
+                        fontWeight: '500',
+                      },
+                    },
+                  },
+                }}
               />
             </LocalizationProvider>
           </Grid>
@@ -952,7 +970,7 @@ const VATRefundClaims: React.FC = () => {
       </Box>
 
       {/* Form UI */}
-      <Box>
+      <Box mt={4} mb={6} p={4}>
         <Typography variant="h3" gutterBottom sx={{ mb: 3 }}>
           VAT Refund
         </Typography>
@@ -960,7 +978,7 @@ const VATRefundClaims: React.FC = () => {
           <Grid container spacing={3}>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Client Name"
+                placeholder="Client Name"
                 name="clientname"
                 value={formRefundDetail.clientname}
                 onChange={handleChange}
@@ -969,7 +987,7 @@ const VATRefundClaims: React.FC = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Refund Period"
+                placeholder="Refund Period"
                 name="refundperiod"
                 value={formRefundDetail.refundperiod}
                 onChange={handleChange}
@@ -978,7 +996,7 @@ const VATRefundClaims: React.FC = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Refund Amount"
+                placeholder="Refund Amount"
                 name="refundamount"
                 type="number"
                 value={formRefundDetail.refundamount}
@@ -1007,7 +1025,6 @@ const VATRefundClaims: React.FC = () => {
             <Grid item xs={12} sm={6}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
-                  label="Application Submission Date"
                   value={
                     formRefundDetail.applicationsubmission
                       ? dayjs(formRefundDetail.applicationsubmission)
@@ -1019,14 +1036,23 @@ const VATRefundClaims: React.FC = () => {
                       applicationsubmission: newValue ? newValue.format('YYYY-MM-DD') : '',
                     }))
                   }
-                  slotProps={{ textField: { fullWidth: true } }}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      InputProps: {
+                        style: {
+                          color: '#3e4095',
+                          fontWeight: '500',
+                        },
+                      },
+                    },
+                  }}
                 />
               </LocalizationProvider>
             </Grid>
             <Grid item xs={12} sm={6}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
-                  label="Approval Date"
                   value={
                     formRefundDetail.approvaldate ? dayjs(formRefundDetail.approvaldate) : null
                   }
@@ -1036,7 +1062,17 @@ const VATRefundClaims: React.FC = () => {
                       approvaldate: newValue ? newValue.format('YYYY-MM-DD') : '',
                     }))
                   }
-                  slotProps={{ textField: { fullWidth: true } }}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      InputProps: {
+                        style: {
+                          color: '#3e4095',
+                          fontWeight: '500',
+                        },
+                      },
+                    },
+                  }}
                 />
               </LocalizationProvider>
             </Grid>
@@ -1060,7 +1096,7 @@ const VATRefundClaims: React.FC = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Email"
+                placeholder="Email"
                 name="email"
                 value={formRefundDetail.email}
                 onChange={(e) => {
@@ -1077,9 +1113,8 @@ const VATRefundClaims: React.FC = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
-                label="Password"
+                placeholder="Password"
                 name="password"
-                type="password"
                 value={formRefundDetail.password}
                 onChange={handleChange}
                 required
@@ -1088,7 +1123,7 @@ const VATRefundClaims: React.FC = () => {
             </Grid>
             <Grid item xs={12}>
               <TextField
-                label="Comment"
+                placeholder="Comment"
                 name="comment"
                 value={formRefundDetail.comment}
                 onChange={handleChange}
@@ -1097,17 +1132,76 @@ const VATRefundClaims: React.FC = () => {
                 fullWidth
               />
             </Grid>
-            <Grid item xs={12}>
-              <Button variant="contained" onClick={exportToCSV} sx={{ mr: 2 }}>
+            <Grid item xs={12} textAlign="right">
+              <Button
+                variant="contained"
+                onClick={exportToCSV}
+                sx={{
+                  backgroundColor: 'primary.main',
+                  color: '#fff',
+                  mr: 2,
+                  '&:hover': {
+                    backgroundColor: '#fff',
+                    color: 'primary.main',
+                    border: '2px solid',
+                    borderColor: 'primary.main',
+                    boxShadow: 4,
+                  },
+                }}
+              >
                 Export CSV
               </Button>
-              <Button variant="contained" onClick={exportToExcel} sx={{ mr: 2 }}>
+              <Button
+                variant="contained"
+                onClick={exportToExcel}
+                sx={{
+                  backgroundColor: 'primary.main',
+                  color: '#fff',
+                  mr: 2,
+                  '&:hover': {
+                    backgroundColor: '#fff',
+                    color: 'primary.main',
+                    border: '2px solid',
+                    borderColor: 'primary.main',
+                    boxShadow: 4,
+                  },
+                }}
+              >
                 Export Excel
               </Button>
-              <Button variant="contained" onClick={exportToPDF} sx={{ mr: 2 }}>
+              <Button
+                variant="contained"
+                onClick={exportToPDF}
+                sx={{
+                  backgroundColor: 'primary.main',
+                  color: '#fff',
+                  mr: 2,
+                  '&:hover': {
+                    backgroundColor: '#fff',
+                    color: 'primary.main',
+                    border: '2px solid',
+                    borderColor: 'primary.main',
+                    boxShadow: 4,
+                  },
+                }}
+              >
                 Export PDF
               </Button>
-              <Button variant="contained" type="submit">
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  backgroundColor: 'primary.main',
+                  color: '#fff',
+                  '&:hover': {
+                    backgroundColor: '#fff',
+                    color: 'primary.main',
+                    border: '2px solid',
+                    borderColor: 'primary.main',
+                    boxShadow: 4,
+                  },
+                }}
+              >
                 Submit
               </Button>
             </Grid>

@@ -25,6 +25,7 @@ export default defineConfig({
       '/refund': 'http://localhost:5000',
       '/documents': 'http://localhost:5000',
       '/sendEmail': 'http://localhost:5000',
+      '/kyc': 'http://localhost:5000',
     },
   },
   preview: {

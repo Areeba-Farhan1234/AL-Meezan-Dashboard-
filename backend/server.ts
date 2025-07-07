@@ -10,6 +10,7 @@ import deregRoutes from './routes/vatdereg';
 import refundRoutes from './routes/vatrefund';
 import documentRoutes from './routes/document';
 import sendEmailRoutes from './routes/sendEmail';
+import kycRoutes from './routes/kyc';
 
 dotenv.config();
 
@@ -46,6 +47,7 @@ app.use('/dereg', deregRoutes);
 app.use('/refund', refundRoutes);
 app.use('/documents', documentRoutes);
 app.use('/sendEmail', sendEmailRoutes);
+app.use('/kyc', kycRoutes);
 
 // ===== NOT FOUND HANDLER =====
 app.use((_req: Request, res: Response) => {

@@ -10,7 +10,7 @@ import PageLoader from 'components/loader/PageLoader';
 // Lazy-loaded components
 const App = lazy(() => import('App'));
 const Dashboard = lazy(() => import('pages/dashboard/Dashbaord'));
-const Clients = lazy(() => import('pages/dashboard/Clients'));
+// const Home = lazy(() => import('pages/dashboard/Home'));
 const Logout = lazy(() => import('layouts/main-layout/topbar/Profile/Logout'));
 const PendingTasks = lazy(() => import('pages/dashboard/PendingTasks'));
 const UpcomingDeadlines = lazy(() => import('pages/dashboard/UpcomingDeadlines'));
@@ -95,10 +95,10 @@ const router = createBrowserRouter(
               index: true,
               element: <Dashboard />,
             },
-            {
-              path: paths.clients,
-              element: <Clients />,
-            },
+            // {
+            //   path: paths.home,
+            //   element: <Home />,
+            // },
 
             {
               path: paths.logout,

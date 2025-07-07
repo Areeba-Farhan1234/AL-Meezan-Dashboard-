@@ -14,6 +14,7 @@ import {
   TextField,
   Chip,
   Snackbar,
+  TableContainer,
   Alert,
   Dialog,
   DialogContent,
@@ -46,6 +47,48 @@ const DocumentPage: React.FC = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMessage, setDialogMessage] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [startY, setStartY] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [scrollTop, setScrollTop] = useState(0);
+  const onMouseDown = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    setIsDragging(true);
+    setStartX(e.pageX - containerRef.current.offsetLeft);
+    setStartY(e.pageY - containerRef.current.offsetTop);
+    setScrollLeft(containerRef.current.scrollLeft);
+    setScrollTop(containerRef.current.scrollTop);
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !containerRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - containerRef.current.offsetLeft;
+    const y = e.pageY - containerRef.current.offsetTop;
+    const walkX = x - startX;
+    const walkY = y - startY;
+    containerRef.current.scrollLeft = scrollLeft - walkX;
+    containerRef.current.scrollTop = scrollTop - walkY;
+  };
+
+  const onMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const onMouseLeave = () => {
+    setIsDragging(false);
+  };
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const hasAutoScrolled = useRef(false);
+
+  useEffect(() => {
+    if (containerRef.current && !hasAutoScrolled.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+      hasAutoScrolled.current = true;
+    }
+  }, [documents.length]);
 
   const openSnackbar = (message: string) => {
     setSnackbarMessage(message);
@@ -181,78 +224,107 @@ const DocumentPage: React.FC = () => {
         <Typography variant="caption">Maximum file size: 10 MB</Typography>
       </Box>
 
-      {/* Document Table */}
       <Box mt={5} mb={10}>
         <Typography variant="h6">Recent Documents</Typography>
-        <Paper elevation={2}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Document Name</TableCell>
-                <TableCell>Created On</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {documents.length > 0 ? (
-                documents.map((doc) => (
-                  <TableRow key={doc._id}>
-                    <TableCell>
-                      <Box display="flex" alignItems="center" gap={1}>
-                        {getFileIcon(doc.name)}
+        <Paper
+          elevation={2}
+          ref={containerRef}
+          onMouseDown={onMouseDown}
+          onMouseMove={onMouseMove}
+          onMouseUp={onMouseUp}
+          onMouseLeave={onMouseLeave}
+          sx={{
+            maxHeight: 400,
+            overflow: 'auto',
+            cursor: isDragging ? 'grabbing' : 'grab',
+            userSelect: 'none',
+            '&::-webkit-scrollbar': {
+              width: 8,
+            },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: '#ccc',
+              borderRadius: 2,
+            },
+            '&::-webkit-scrollbar-thumb:hover': {
+              backgroundColor: '#999',
+            },
+          }}
+        >
+          <TableContainer
+            ref={containerRef}
+            sx={{
+              maxHeight: 400,
+              overflowY: 'auto',
+            }}
+          >
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Document Name</TableCell>
+                  <TableCell>Created On</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {documents.length > 0 ? (
+                  documents.map((doc) => (
+                    <TableRow key={doc._id}>
+                      <TableCell>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          {getFileIcon(doc.name)}
+                          {editingId === doc._id ? (
+                            <TextField
+                              size="small"
+                              value={doc.name}
+                              onChange={(e) =>
+                                setDocuments((prev) =>
+                                  prev.map((d) =>
+                                    d._id === doc._id ? { ...d, name: e.target.value } : d,
+                                  ),
+                                )
+                              }
+                            />
+                          ) : (
+                            doc.name
+                          )}
+                        </Box>
+                      </TableCell>
+                      <TableCell>{new Date(doc.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        <Chip label={doc.status} color="info" />
+                      </TableCell>
+                      <TableCell>
+                        <IconButton onClick={() => handleDownload(doc.fileUrl)}>
+                          <Download />
+                        </IconButton>
                         {editingId === doc._id ? (
-                          <TextField
-                            size="small"
-                            value={doc.name}
-                            onChange={(e) =>
-                              setDocuments((prev) =>
-                                prev.map((d) =>
-                                  d._id === doc._id ? { ...d, name: e.target.value } : d,
-                                ),
-                              )
-                            }
-                          />
+                          <IconButton onClick={() => handleSave(doc._id, doc.name)}>
+                            <Save />
+                          </IconButton>
                         ) : (
-                          doc.name
+                          <IconButton onClick={() => handleEdit(doc._id)}>
+                            <Edit />
+                          </IconButton>
                         )}
-                      </Box>
-                    </TableCell>
-                    <TableCell>{new Date(doc.createdAt).toLocaleDateString()}</TableCell>
-                    <TableCell>
-                      <Chip label={doc.status} color="info" />
-                    </TableCell>
-                    <TableCell>
-                      <IconButton onClick={() => handleDownload(doc.fileUrl)}>
-                        <Download />
-                      </IconButton>
-                      {editingId === doc._id ? (
-                        <IconButton onClick={() => handleSave(doc._id, doc.name)}>
-                          <Save />
+                        <IconButton onClick={() => handleDelete(doc._id)}>
+                          <Delete />
                         </IconButton>
-                      ) : (
-                        <IconButton onClick={() => handleEdit(doc._id)}>
-                          <Edit />
-                        </IconButton>
-                      )}
-                      <IconButton onClick={() => handleDelete(doc._id)}>
-                        <Delete />
-                      </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} align="center">
+                      No documents found
                     </TableCell>
                   </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={4} align="center">
-                    No documents found
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </Paper>
       </Box>
-
       {/* Snackbar Toast */}
       <Snackbar
         open={snackbarOpen}

@@ -25,7 +25,7 @@ interface ClientsContextType {
 
 const ClientsContext = createContext<ClientsContextType | undefined>(undefined);
 
-export const ClientsProvider = ({ children }: { children: ReactNode }) => {
+export const VatRegProvider = ({ children }: { children: ReactNode }) => {
   const [clients, setClients] = useState<VatForm[]>([]);
 
   const fetchClients = async () => {
@@ -67,7 +67,7 @@ export const ClientsProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useClients = () => {
+export const useVatReg = () => {
   const context = useContext(ClientsContext);
   if (!context) {
     throw new Error('useClients must be used within a ClientsProvider');

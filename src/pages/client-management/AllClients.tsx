@@ -114,16 +114,8 @@ const ClientsList: React.FC = () => {
       <Box>
         <Box mt={4} mb={2}>
           <Typography variant="h3" marginBottom="16px" gutterBottom>
-            {' '}
             Clients List
           </Typography>
-          <Button
-            variant="contained"
-            onClick={() => navigate('vatRefund')}
-            sx={{ background: '#3e4095' }}
-          >
-            + New Entry
-          </Button>
         </Box>
 
         {clients.length > 0 ? (

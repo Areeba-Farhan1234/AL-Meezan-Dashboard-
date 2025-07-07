@@ -1,20 +1,3 @@
-// const mongoose = require('mongoose');
-
-// const clientSchema = new mongoose.Schema({
-//   name: String,
-//   email: String,
-//   vat_number: String,
-//   ct_number: String,
-//   password: String,
-//   entity_type: String,
-//   business_type: String,
-//   emirates: String,
-//   location: String,
-//   upcoming_due: String,
-// });
-
-// module.exports = mongoose.model('Client', clientSchema);
-
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IClient extends Document {
@@ -28,6 +11,7 @@ export interface IClient extends Document {
   emirates: string;
   location: string;
   upcoming_due: string;
+  createdAt?: Date;
 }
 
 const clientSchema: Schema = new Schema({
