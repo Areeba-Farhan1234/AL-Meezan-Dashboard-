@@ -14,6 +14,14 @@ export interface Client {
   emirates: string;
   location: string;
   upcoming_due: string;
+  company: string;
+  ct_due_date: string; // stored as 'YYYY-MM-DD' string from Dayjs
+  vat_due_date: string;
+  trade_licence_expiry: string;
+  password_expiry: string;
+  emirate: string;
+  contact_number: string;
+  address: string;
 }
 
 // Define the context type

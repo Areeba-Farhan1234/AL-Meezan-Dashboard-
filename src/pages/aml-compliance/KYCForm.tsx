@@ -706,7 +706,7 @@ const KYCForm: React.FC = () => {
                   <Typography variant="h6">Company Name</Typography>
                   <TextField
                     name="name"
-                    label="Company Name"
+                    placeholder="Company Name"
                     fullWidth
                     required
                     variant="outlined"

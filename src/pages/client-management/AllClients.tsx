@@ -95,22 +95,27 @@ const ClientsList: React.FC = () => {
     }
   };
 
-  // Helper: Fields to display in table and their labels
   const fields: { key: keyof Client; label: string; align?: 'left' | 'center' }[] = [
     { key: 'name', label: 'Name', align: 'left' },
-    { key: 'entity_type', label: 'Entity Type', align: 'center' },
-    { key: 'business_type', label: 'Business Type', align: 'center' },
-    { key: 'emirates', label: 'Emirates', align: 'center' },
-    { key: 'location', label: 'Location', align: 'center' },
-    { key: 'vat_number', label: 'VAT Number', align: 'center' },
-    { key: 'ct_number', label: 'CT Number', align: 'center' },
-    { key: 'email', label: 'Email', align: 'center' },
-    { key: 'password', label: 'Password', align: 'center' },
-    { key: 'upcoming_due', label: 'Upcoming Due', align: 'center' },
+    { key: 'entity_type', label: 'Entity Type' },
+    { key: 'business_type', label: 'Business Type' },
+    { key: 'emirates', label: 'Emirates' },
+    { key: 'location', label: 'Location' },
+    { key: 'vat_number', label: 'VAT Number' },
+    { key: 'ct_number', label: 'CT Number' },
+    { key: 'email', label: 'Email' },
+    { key: 'password', label: 'Password' },
+    { key: 'ct_due_date', label: 'CT Due' },
+    { key: 'vat_due_date', label: 'VAT Due' },
+    { key: 'trade_licence_expiry', label: 'Licence Expiry' },
+    { key: 'emirate', label: 'Emirate ID' },
+    { key: 'password_expiry', label: 'Password Expiry' },
+    { key: 'contact_number', label: 'Contact' },
+    { key: 'address', label: 'Address' },
   ];
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, position: 'relative' }}>
+    <Container maxWidth="xl" sx={{ mt: 4, position: 'relative' }}>
       <Box>
         <Box mt={4} mb={2}>
           <Typography variant="h3" marginBottom="16px" gutterBottom>
@@ -129,30 +134,59 @@ const ClientsList: React.FC = () => {
               sx={{
                 width: '100%',
                 maxHeight: '500px',
-                overflow: 'auto', // enables both x and y scrollbars
+                overflowX: 'auto',
+                overflowY: 'auto',
                 cursor: isDragging ? 'grabbing' : 'grab',
                 userSelect: 'none',
                 marginBottom: '8px',
+
+                scrollbarWidth: 'auto',
+                scrollbarColor: '#3e4095 #f0f0f0',
+
                 '&::-webkit-scrollbar': {
-                  width: 8,
-                  height: 8,
+                  width: '20px',
+                  height: '20px',
+                },
+                '&::-webkit-scrollbar-track': {
+                  backgroundColor: '#f0f0f0',
+                  borderRadius: '10px',
                 },
                 '&::-webkit-scrollbar-thumb': {
-                  backgroundColor: '#ccc',
-                  borderRadius: 2,
+                  backgroundColor: '#3e4095',
+                  borderRadius: '10px',
+                  border: '2px solid transparent',
+                  backgroundClip: 'content-box',
                 },
                 '&::-webkit-scrollbar-thumb:hover': {
-                  backgroundColor: '#999',
+                  backgroundColor: '#555',
                 },
               }}
             >
               <TableContainer
                 component={Paper}
                 sx={{
+                  overflowX: 'auto',
+                  overflowY: 'auto',
                   minWidth: 1600,
+                  width: 'fit-content',
+                  backgroundColor: '#fff',
                   borderRadius: '2px',
                   boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
-                  backgroundColor: '#fff',
+
+                  '&::-webkit-scrollbar': {
+                    width: '20px',
+                    height: '20px',
+                  },
+                  '&::-webkit-scrollbar-track': {
+                    backgroundColor: '#eaeaea',
+                  },
+                  '&::-webkit-scrollbar-thumb': {
+                    backgroundColor: '#888',
+                    borderRadius: '10px',
+                  },
+                  '&::-webkit-scrollbar-thumb:hover': {
+                    backgroundColor: '#666',
+                  },
                 }}
               >
                 <Table sx={{ minWidth: 1600 }} aria-label="clients table" stickyHeader>
