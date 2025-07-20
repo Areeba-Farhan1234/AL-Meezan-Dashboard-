@@ -27,11 +27,11 @@ const sitemap: MenuItem[] = [
     icon: 'ri:dashboard-fill',
     active: true,
     items: [
-      {
-        name: 'Clients',
-        pathName: 'clients',
-        path: paths.clients,
-      },
+      // {
+      //   name: 'Home',
+      //   pathName: 'home',
+      //   path: paths.home,
+      // },
 
       {
         name: 'Pending Tasks',

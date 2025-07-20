@@ -1,3 +1,4 @@
+// export default router;
 import express from 'express';
 import VatDeregistration from '../models/VATdereg';
 import { Parser } from 'json2csv';
@@ -27,7 +28,33 @@ router.post('/', async (req, res) => {
     res.status(400).json({ error: 'Error saving client' });
   }
 });
+//  UPDATE client by ID
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const payload = {
+      ...req.body,
+      approvaldate: req.body.approvaldate ? new Date(req.body.approvaldate) : null,
+    };
+    const updated = await VatDeregistration.findByIdAndUpdate(id, payload, { new: true });
+    if (!updated) return res.status(404).json({ error: 'Client not found' });
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ error: 'Error updating client' });
+  }
+});
 
+// DELETE client by ID
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await VatDeregistration.findByIdAndDelete(id);
+    if (!deleted) return res.status(404).json({ error: 'Client not found' });
+    res.json({ message: 'Client deleted successfully' });
+  } catch (err) {
+    res.status(400).json({ error: 'Error deleting client' });
+  }
+});
 // EXPORT as CSV
 router.get('/export/csv', async (req, res) => {
   try {

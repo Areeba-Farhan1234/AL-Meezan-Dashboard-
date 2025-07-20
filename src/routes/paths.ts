@@ -14,7 +14,7 @@ const paths = {
   dashboard: `/${rootPaths.pageRoot}/dashboard`,
 
   // Dashboard Subpages
-  Clients: `/${rootPaths.pageRoot}/dashboard/clients`,
+  // home: `/${rootPaths.pageRoot}/dashboard`,
   pendingTasks: `/${rootPaths.pageRoot}/dashboard/pending-tasks`,
   upcomingDeadlines: `/${rootPaths.pageRoot}/dashboard/upcoming-deadlines`,
   alerts: `/${rootPaths.pageRoot}/dashboard/alerts`,
@@ -45,9 +45,9 @@ const paths = {
   vatInquiriesComplains: `/${rootPaths.vatRoot}/vat-inquiries-complains`,
 
   // VAT Form List
-  vatRegistrationList: `/${rootPaths.listRoot}/all-reports`,
-  vatDeRegistrationList: `/${rootPaths.listRoot}/generate-new`,
-  vatRefundClaimsList: `/${rootPaths.listRoot}/export`,
+  vatRegistrationList: `/${rootPaths.listRoot}/vat-registration-list`,
+  vatDeRegistrationList: `/${rootPaths.listRoot}/vat-de-registration-list`,
+  vatRefundClaimsList: `/${rootPaths.listRoot}/vat-refund-claims-list`,
 
   // Notifications
   Notifications: `/${rootPaths.notificationsRoot}/notifications`,

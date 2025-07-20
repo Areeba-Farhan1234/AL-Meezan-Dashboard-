@@ -1,4 +1,5 @@
 // RefundContext.tsx
+import { useEffect } from 'react';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Dayjs } from 'dayjs';
 
@@ -32,8 +33,28 @@ export const RefundProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const [toDate, setToDate] = useState<Dayjs | null>(null);
   const [reports, setReports] = useState<VATReport[]>([]);
 
+  // const fetchReports = async () => {
+  //   const params = new URLSearchParams();
+  //   if (client) params.append('client', client);
+  //   if (reportType) params.append('type', reportType);
+  //   if (fromDate) params.append('from', fromDate.format('YYYY-MM-DD'));
+  //   if (toDate) params.append('to', toDate.format('YYYY-MM-DD'));
+
+  //   try {
+  //     const res = await fetch(`/api/reports?${params.toString()}`);
+  //     if (!res.ok) throw new Error('Failed to fetch reports');
+  //     const data = await res.json();
+  //     setReports(data);
+  //   } catch (error) {
+  //     console.error(error);
+  //     setReports([]);
+  //   }
+  // };
+
   const fetchReports = async () => {
     const params = new URLSearchParams();
+
+    // Only append filters if explicitly needed
     if (client) params.append('client', client);
     if (reportType) params.append('type', reportType);
     if (fromDate) params.append('from', fromDate.format('YYYY-MM-DD'));
@@ -41,14 +62,17 @@ export const RefundProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
     try {
       const res = await fetch(`/api/reports?${params.toString()}`);
-      if (!res.ok) throw new Error('Failed to fetch reports');
       const data = await res.json();
-      setReports(data);
+      setReports(data); // Set even if data is empty
     } catch (error) {
       console.error(error);
-      setReports([]);
+      setReports([]); // Clear in case of error
     }
   };
+
+  useEffect(() => {
+    console.log('Refund reports updated', reports);
+  }, [reports]);
 
   return (
     <RefundContext.Provider

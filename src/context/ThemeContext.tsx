@@ -33,36 +33,3 @@ export const ThemeContextProvider = ({ children }: { children: ReactNode }) => {
     </ColorModeContext.Provider>
   );
 };
-
-// import React, { createContext, useMemo, useState } from 'react';
-// import { ThemeProvider, createTheme, CssBaseline, PaletteMode } from '@mui/material';
-// import { getDesignTokens } from '../theme/theme';
-
-// interface ColorModeContextType {
-//   toggleColorMode: () => void;
-//   mode: PaletteMode;
-// }
-
-// export const ColorModeContext = createContext<ColorModeContextType>({
-//   toggleColorMode: () => {},
-//   mode: 'light',
-// });
-
-// export const ThemeContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-//   const [mode, setMode] = useState<PaletteMode>('light');
-
-//   const toggleColorMode = () => {
-//     setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
-//   };
-
-//   const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
-
-//   return (
-//     <ColorModeContext.Provider value={{ toggleColorMode, mode }}>
-//       <ThemeProvider theme={theme}>
-//         <CssBaseline />
-//         {children}
-//       </ThemeProvider>
-//     </ColorModeContext.Provider>
-//   );
-// };
