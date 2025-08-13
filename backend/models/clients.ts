@@ -50,7 +50,10 @@ export interface IClient extends Document {
   emirate: string;
   contact_number: string;
   address: string;
+  revenue: number;
+  uploadedFiles?: string[];
   createdAt?: Date;
+  status: string;
 }
 
 const clientSchema: Schema = new Schema(
@@ -71,8 +74,11 @@ const clientSchema: Schema = new Schema(
     trade_licence_expiry: { type: String },
     password_expiry: { type: String },
     emirate: { type: String },
+    revenue: { type: Number, default: 0 },
+    uploadedFiles: [{ type: String }],
     contact_number: { type: String },
     address: { type: String },
+    status: { type: String },
   },
   { timestamps: true },
 );

@@ -1,3 +1,105 @@
+// import React, { createContext, useState, useEffect, useContext } from 'react';
+// import axios from 'axios';
+
+// // Define the Client interface
+// export interface Client {
+//   _id: number | string;
+//   name: string;
+//   email: string;
+//   vat_number: string;
+//   ct_number: string;
+//   password: string;
+//   entity_type: string;
+//   business_type: string;
+//   emirates: string;
+//   location: string;
+//   upcoming_due: string;
+//   company: string;
+//   ct_due_date: string; // stored as 'YYYY-MM-DD' string from Dayjs
+//   vat_due_date: string;
+//   trade_licence_expiry: string;
+//   password_expiry: string;
+//   emirate: string;
+//   contact_number: string;
+//   address: string;
+// }
+
+// // Define the context type
+// interface ClientsContextType {
+//   clients: Client[];
+//   setClients: React.Dispatch<React.SetStateAction<Client[]>>;
+//   addClient: (client: Omit<Client, '_id'>) => Promise<void>;
+//   deleteClient: (id: number | string) => Promise<void>;
+//   updateClient: (id: number | string, updatedClient: Partial<Client>) => Promise<void>;
+// }
+
+// // Create the context
+// const ClientsContext = createContext<ClientsContextType | undefined>(undefined);
+
+// // Provider component
+// export const ClientsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+//   const [clients, setClients] = useState<Client[]>([]);
+
+//   useEffect(() => {
+//     const fetchClients = async () => {
+//       try {
+//         const response = await axios.get<Client[]>('/clients');
+//         setClients(response.data);
+//       } catch (error) {
+//         console.error('Error fetching clients:', error);
+//       }
+//     };
+
+//     fetchClients();
+//   }, []);
+
+//   const addClient = async (client: Omit<Client, '_id'>) => {
+//     try {
+//       const response = await axios.post<Client>('/clients', client);
+//       setClients((prev) => [...prev, response.data]);
+//     } catch (error) {
+//       console.error('Error adding client:', error);
+//     }
+//   };
+
+//   const deleteClient = async (id: number | string) => {
+//     try {
+//       await axios.delete(`/clients/${id}`);
+//       setClients((prev) => prev.filter((client) => client._id !== id));
+//     } catch (error) {
+//       console.error('Error deleting client:', error);
+//     }
+//   };
+
+//   const updateClient = async (id: number | string, updatedClient: Partial<Client>) => {
+//     try {
+//       const response = await axios.patch<Client>(`/clients/${id}`, updatedClient);
+//       setClients((prev) =>
+//         prev.map((client) =>
+//           client._id.toString() === id.toString() ? { ...client, ...response.data } : client,
+//         ),
+//       );
+//     } catch (error) {
+//       console.error('Error updating client:', error);
+//     }
+//   };
+
+//   return (
+//     <ClientsContext.Provider value={{ clients, setClients, addClient, deleteClient, updateClient }}>
+//       {children}
+//     </ClientsContext.Provider>
+//   );
+// };
+
+// // Custom hook to use the context
+// export const useClients = (): ClientsContextType => {
+//   const context = useContext(ClientsContext);
+//   if (!context) {
+//     throw new Error('useClients must be used within a ClientsProvider');
+//   }
+//   return context;
+// };
+
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 
@@ -15,13 +117,16 @@ export interface Client {
   location: string;
   upcoming_due: string;
   company: string;
-  ct_due_date: string; // stored as 'YYYY-MM-DD' string from Dayjs
+  ct_due_date: string;
   vat_due_date: string;
   trade_licence_expiry: string;
   password_expiry: string;
   emirate: string;
+  Revenue: string;
   contact_number: string;
   address: string;
+  status: string;
+  uploadedFiles?: string[];
 }
 
 // Define the context type
@@ -31,6 +136,7 @@ interface ClientsContextType {
   addClient: (client: Omit<Client, '_id'>) => Promise<void>;
   deleteClient: (id: number | string) => Promise<void>;
   updateClient: (id: number | string, updatedClient: Partial<Client>) => Promise<void>;
+  uploadClientFile: (id: string, file: File) => Promise<void>;
 }
 
 // Create the context
@@ -73,7 +179,7 @@ export const ClientsProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const updateClient = async (id: number | string, updatedClient: Partial<Client>) => {
     try {
-      const response = await axios.patch<Client>(`/clients/${id}`, updatedClient);
+      const response = await axios.put<Client>(`/clients/${id}`, updatedClient);
       setClients((prev) =>
         prev.map((client) =>
           client._id.toString() === id.toString() ? { ...client, ...response.data } : client,
@@ -84,8 +190,27 @@ export const ClientsProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
+  const uploadClientFile = async (id: string, file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      await axios.post(`/clients/${id}/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      console.log('File uploaded successfully.');
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    }
+  };
+
   return (
-    <ClientsContext.Provider value={{ clients, setClients, addClient, deleteClient, updateClient }}>
+    <ClientsContext.Provider
+      value={{ clients, setClients, addClient, deleteClient, updateClient, uploadClientFile }}
+    >
       {children}
     </ClientsContext.Provider>
   );

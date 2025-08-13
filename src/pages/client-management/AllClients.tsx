@@ -6,15 +6,24 @@ import {
   Table,
   TableHead,
   TableRow,
+  Grid,
   TableCell,
   TableBody,
   IconButton,
   TableContainer,
   Paper,
   Button,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import UploadIcon from '@mui/icons-material/Upload';
+import DownloadIcon from '@mui/icons-material/Download';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+// import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import { useClients, Client } from '../../context/ClientsContext';
 import axios from 'axios';
@@ -24,16 +33,121 @@ const ClientsList: React.FC = () => {
   const navigate = useNavigate();
   const [startY, setStartY] = useState(0);
   const [scrollTop, setScrollTop] = useState(0);
-  // Drag to scroll
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
-
-  // Editing state for single row - stores client ID or null
   const [editingClientId, setEditingClientId] = useState<string | number | null>(null);
-  // Local copy of client being edited
   const [editedClient, setEditedClient] = useState<Partial<Client>>({});
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
+  // const fileInputRef = useRef<HTMLInputElement>(null);
+  const open = Boolean(anchorEl);
+  const [isOn, setIsOn] = useState(true);
+
+  const toggle = () => {
+    setIsOn((prev) => !prev);
+  };
+
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>, id: string) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedClientId(id);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+    setSelectedClientId(null);
+  };
+
+  // const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = event.target.files?.[0];
+  //   if (!file || !selectedClientId) return;
+
+  //   const formData = new FormData();
+  //   formData.append('file', file);
+
+  //   axios
+  //     .post(`/clients/${selectedClientId}/upload`, formData)
+  //     .then(() => {
+  //       toast.success('File uploaded successfully 🎉');
+  //     })
+  //     .catch(() => {
+  //       toast.error('Upload failed ❌');
+  //     })
+  //     .finally(() => {
+  //       handleCloseMenu();
+  //     });
+  // };
+
+  // const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const files = event.target.files;
+  //   if (!files || !selectedClientId) return;
+
+  //   const formData = new FormData();
+  //   Array.from(files).forEach((file) => {
+  //     formData.append('files', file); // must match backend field name
+  //   });
+
+  //   axios
+  //     .post(`/clients/${selectedClientId}/upload`, formData)
+  //     .then(() => {
+  //       toast.success('Files uploaded successfully 🎉');
+  //       fetchClientFiles(selectedClientId); // refresh list
+  //     })
+  //     .catch(() => {
+  //       toast.error('Upload failed ❌');
+  //     })
+  //     .finally(() => {
+  //       handleCloseMenu();
+  //     });
+  // };
+
+  // const [clientFiles, setClientFiles] = useState<{ name: string }[]>([]);
+
+  // const fetchClientFiles = async (id: string) => {
+  //   try {
+  //     const res = await axios.get(`/clients/${id}/files`);
+  //     setClientFiles(res.data.files); // [{ name: "file1.pdf" }, ...]
+  //   } catch (err) {
+  //     toast.error('Failed to load files');
+  //   }
+  // };
+
+  // const handleFileDownload = () => {
+  //   if (!selectedClientId) return;
+
+  //   axios
+  //     .get(`/clients/${selectedClientId}/download`, { responseType: 'blob' })
+  //     .then((res) => {
+  //       const url = window.URL.createObjectURL(new Blob([res.data]));
+  //       const link = document.createElement('a');
+  //       link.href = url;
+  //       link.setAttribute('download', 'client_file.pdf');
+  //       document.body.appendChild(link);
+  //       link.click();
+  //       toast.success('File downloaded 🎉');
+  //     })
+  //     .catch(() => toast.error('Download failed ❌'))
+  //     .finally(() => handleCloseMenu());
+  // };
+
+  // const handleFileDownloadAll = () => {
+  //   if (!selectedClientId) return;
+
+  //   axios
+  //     .get(`/clients/${selectedClientId}/download-all`, { responseType: 'blob' })
+  //     .then((res) => {
+  //       const url = window.URL.createObjectURL(new Blob([res.data]));
+  //       const link = document.createElement('a');
+  //       link.href = url;
+  //       link.setAttribute('download', `client_${selectedClientId}_files.zip`);
+  //       document.body.appendChild(link);
+  //       link.click();
+  //       toast.success('All files downloaded 🎉');
+  //     })
+  //     .catch(() => toast.error('Download failed ❌'))
+  //     .finally(() => handleCloseMenu());
+  // };
 
   const onMouseLeave = () => {
     setIsDragging(false);
@@ -57,15 +171,15 @@ const ClientsList: React.FC = () => {
     e.preventDefault();
     const x = e.pageX - containerRef.current.offsetLeft;
     const y = e.pageY - containerRef.current.offsetTop;
-    const walkX = (x - startX) * 1; // horizontal speed multiplier
-    const walkY = (y - startY) * 1; // vertical speed multiplier
+    const walkX = (x - startX) * 1;
+    const walkY = (y - startY) * 1;
     containerRef.current.scrollLeft = scrollLeft - walkX;
     containerRef.current.scrollTop = scrollTop - walkY;
   };
   // Start editing whole row
   const handleEditRow = (client: Client) => {
     setEditingClientId(client._id);
-    setEditedClient({ ...client }); // create a copy for editing
+    setEditedClient({ ...client });
   };
 
   // Cancel editing
@@ -111,17 +225,71 @@ const ClientsList: React.FC = () => {
     { key: 'emirate', label: 'Emirate ID' },
     { key: 'password_expiry', label: 'Password Expiry' },
     { key: 'contact_number', label: 'Contact' },
-    { key: 'address', label: 'Address' },
+    { key: 'address', label: 'Address', align: 'left' },
+    { key: 'status', label: 'Status' },
   ];
+
+  const commonCellStyles = {
+    padding: '10px 20px',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+    overflow: 'hidden',
+    fontSize: '14px',
+  };
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, position: 'relative' }}>
       <Box>
-        <Box mt={4} mb={2}>
-          <Typography variant="h3" marginBottom="16px" gutterBottom>
-            Clients List
-          </Typography>
-        </Box>
+        <Grid item xs={12}>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 2,
+              marginTop: 4,
+            }}
+          >
+            {/* Left Side */}
+            <Typography variant="h3" gutterBottom>
+              Clients List
+            </Typography>
+
+            {/* Right Side: Toggle */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Typography variant="subtitle1">
+                {isOn ? 'Active Clients' : 'Inactive Clients'}
+              </Typography>
+
+              <Box
+                onClick={toggle}
+                sx={{
+                  width: '60px',
+                  height: '32px',
+                  borderRadius: '999px',
+                  backgroundColor: isOn ? '#3e4595' : '#e0e0e0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '4px',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                  transition: 'background-color 0.3s',
+                }}
+              >
+                <Box
+                  sx={{
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    backgroundColor: '#ccc',
+                    transform: isOn ? 'translateX(28px)' : 'translateX(0)',
+                    transition: 'transform 0.3s',
+                  }}
+                />
+              </Box>
+            </Box>
+          </Box>
+        </Grid>
 
         {clients.length > 0 ? (
           <>
@@ -172,7 +340,6 @@ const ClientsList: React.FC = () => {
                   backgroundColor: '#fff',
                   borderRadius: '2px',
                   boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
-
                   '&::-webkit-scrollbar': {
                     width: '20px',
                     height: '20px',
@@ -189,7 +356,7 @@ const ClientsList: React.FC = () => {
                   },
                 }}
               >
-                <Table sx={{ minWidth: 1600 }} aria-label="clients table" stickyHeader>
+                <Table sx={{ minWidth: 1600, tableLayout: 'auto' }} stickyHeader>
                   <TableHead>
                     <TableRow>
                       {fields.map(({ label, key, align }) => (
@@ -197,13 +364,10 @@ const ClientsList: React.FC = () => {
                           key={key}
                           align={align || 'center'}
                           sx={{
-                            fontWeight: 700,
+                            ...commonCellStyles,
+                            fontWeight: 800,
                             color: '#2d2d63',
                             backgroundColor: '#f9faff',
-                            fontSize: '14px',
-                            padding: '6px 10px',
-                            whiteSpace: 'nowrap',
-                            minWidth: key === 'upcoming_due' ? 140 : undefined,
                           }}
                         >
                           {label}
@@ -212,10 +376,23 @@ const ClientsList: React.FC = () => {
                       <TableCell
                         align="center"
                         sx={{
-                          fontWeight: 400,
+                          fontWeight: 700,
                           color: '#2d2d63',
                           backgroundColor: '#f9faff',
-                          padding: '6px 10px',
+                          padding: '6px 16px',
+                          whiteSpace: 'nowrap',
+                          minWidth: 120,
+                        }}
+                      >
+                        Files
+                      </TableCell>
+                      <TableCell
+                        align="center"
+                        sx={{
+                          fontWeight: 700,
+                          color: '#2d2d63',
+                          backgroundColor: '#f9faff',
+                          padding: '6px 16px',
                           whiteSpace: 'nowrap',
                           minWidth: 140,
                         }}
@@ -224,6 +401,7 @@ const ClientsList: React.FC = () => {
                       </TableCell>
                     </TableRow>
                   </TableHead>
+
                   <TableBody>
                     {clients.map((client) => {
                       const isEditing = editingClientId === client._id;
@@ -243,7 +421,7 @@ const ClientsList: React.FC = () => {
                                 <TableCell
                                   key={key}
                                   align={align || 'center'}
-                                  sx={{ padding: '6px 10px', whiteSpace: 'nowrap' }}
+                                  sx={{ padding: '6px 16px', whiteSpace: 'nowrap' }}
                                 >
                                   {client[key]}
                                 </TableCell>
@@ -254,7 +432,10 @@ const ClientsList: React.FC = () => {
                               <TableCell
                                 key={key}
                                 align={align || 'center'}
-                                sx={{ padding: '6px 10px', whiteSpace: 'nowrap' }}
+                                sx={{
+                                  ...commonCellStyles,
+                                  minWidth: key === 'address' ? 200 : 'auto',
+                                }}
                               >
                                 {isEditing ? (
                                   <input
@@ -273,7 +454,7 @@ const ClientsList: React.FC = () => {
                                     style={{
                                       width: '100%',
                                       border: '2px solid #413f91',
-                                      padding: '4px 6px',
+                                      padding: '6px 16px',
                                     }}
                                     autoFocus={key === fields[0].key}
                                     title={`Enter ${key.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
@@ -284,10 +465,14 @@ const ClientsList: React.FC = () => {
                               </TableCell>
                             );
                           })}
-                          <TableCell
-                            align="center"
-                            sx={{ padding: '6px 10px', whiteSpace: 'nowrap' }}
-                          >
+
+                          <TableCell align="center" sx={{ ...commonCellStyles }}>
+                            <IconButton onClick={(e) => handleMenuClick(e, String(client._id))}>
+                              <MoreVertIcon />
+                            </IconButton>
+                          </TableCell>
+
+                          <TableCell align="center" sx={{ ...commonCellStyles }}>
                             {isEditing ? (
                               <>
                                 <Button
@@ -322,7 +507,7 @@ const ClientsList: React.FC = () => {
                                 <IconButton
                                   aria-label="delete"
                                   onClick={() => handleDeleteClient(client._id)}
-                                  disabled={editingClientId !== null} // prevent deletion while editing
+                                  disabled={editingClientId !== null}
                                 >
                                   <DeleteIcon />
                                 </IconButton>
@@ -348,6 +533,55 @@ const ClientsList: React.FC = () => {
             Add Client
           </Button>
         </Box>
+        {/* <Menu anchorEl={anchorEl} open={open} onClose={handleCloseMenu}>
+          <MenuItem onClick={() => fileInputRef.current?.click()}>
+            <UploadIcon fontSize="small" sx={{ mr: 1 }} />
+            Upload
+          </MenuItem>
+          <MenuItem onClick={handleFileDownload}>
+            <DownloadIcon fontSize="small" sx={{ mr: 1 }} />
+            Download
+          </MenuItem>
+        </Menu> */}
+
+        {/* <Menu anchorEl={anchorEl} open={open} onClose={handleCloseMenu}>
+          <MenuItem onClick={() => fileInputRef.current?.click()}>
+            <UploadIcon fontSize="small" sx={{ mr: 1 }} />
+            Upload Files
+          </MenuItem>
+          <MenuItem> onClick={handleFileDownloadAll}
+            <DownloadIcon fontSize="small" sx={{ mr: 1 }} />
+            Download All
+          </MenuItem>
+          <MenuItem >  onClick={() => selectedClientId && fetchClientFiles(selectedClientId)}
+            📂 View Files
+          </MenuItem>
+        </Menu>
+
+        <input
+          title="file"
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileUpload}
+          accept=".pdf,.doc,.docx,.jpg,.png,.xlsx"
+          multiple
+          hidden
+        /> */}
+
+        <Menu anchorEl={anchorEl} open={open} onClose={handleCloseMenu}>
+          <MenuItem>
+            <UploadIcon fontSize="small" sx={{ mr: 1 }} />
+            Upload Files
+          </MenuItem>
+          <MenuItem>
+            <DownloadIcon fontSize="small" sx={{ mr: 1 }} />
+            Download All
+          </MenuItem>
+          <MenuItem onClick={() => selectedClientId && console.log(selectedClientId)}>
+            <VisibilityIcon fontSize="small" sx={{ mr: 1 }} />
+            View Files
+          </MenuItem>
+        </Menu>
       </Box>
     </Container>
   );
