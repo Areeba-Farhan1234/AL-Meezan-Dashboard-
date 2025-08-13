@@ -18,6 +18,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
+import { useNotifications } from 'context/Notification';
+import { Timestamp } from 'firebase/firestore';
 
 const VatRegistrationList: React.FC = () => {
   const [data, setData] = useState<VatForm[]>([]);
@@ -77,9 +79,26 @@ const VatRegistrationList: React.FC = () => {
     return date ? new Date(date).toLocaleDateString('en-GB') : '';
   };
 
+  const { addNotification } = useNotifications();
+
   useEffect(() => {
-    fetchData();
-  }, []);
+    data.forEach((item) => {
+      if (!item.approvaldate) return;
+
+      const expiryDate = new Date(item.approvaldate);
+      const today = new Date();
+      const timeDiff = expiryDate.getTime() - today.getTime();
+      const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+      if (daysLeft <= 7 && daysLeft >= 0) {
+        addNotification({
+          message: `VAT for ${item.clientname} is expiring in ${daysLeft} day(s)!`,
+          createdAt: Timestamp.fromDate(new Date()),
+          seen: false, // ✅ Add this if your Notification type expects it
+        });
+      }
+    });
+  }, [data]);
 
   const fetchData = async () => {
     try {
