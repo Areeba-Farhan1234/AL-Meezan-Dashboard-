@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { useClients } from '../../context/ClientsContext';
 import {
   TextField,
@@ -21,9 +22,11 @@ import { SelectChangeEvent } from '@mui/material/Select';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { Dayjs } from 'dayjs';
-// import dayjs from 'dayjs';
+import dayjs from 'dayjs';
+import axios from 'axios';
 
 interface ClientFormData {
+  _id?: string;
   name: string;
   email: string;
   vat_number: string;
@@ -38,8 +41,8 @@ interface ClientFormData {
   ct_due_date: Dayjs | null;
   vat_due_date: Dayjs | null;
   trade_licence_expiry: Dayjs | null;
-  password_expiry: Dayjs | null;
-  emirate: string;
+  passport_expiry: Dayjs | null;
+  emirate_id_expiry: Dayjs | null;
   Revenue: string;
   contact_number: string;
   address: string;
@@ -51,21 +54,38 @@ const AddClients: React.FC = () => {
   const theme = useTheme();
   const navigate = useNavigate();
 
-  const [businessTypes, setBusinessTypes] = useState([
+  const [businessTypes, setBusinessTypes] = useState<string[]>([
     'Jewellery',
     'Real Estate',
     'General Trading',
   ]);
 
-  const handleAddNewType = () => {
-    const type = prompt('Enter a new Business Type:');
-    if (type && !businessTypes.includes(type)) {
-      setBusinessTypes((prev) => [...prev, type]);
-      setClientData((prev) => ({ ...prev, business_type: type }));
+  useEffect(() => {
+    const savedTypes = localStorage.getItem('businessTypes');
+    if (savedTypes) {
+      setBusinessTypes(JSON.parse(savedTypes));
     }
+  }, []);
+
+  const handleAddNewType = () => {
+    const newType = prompt('Enter a new Business Type:');
+    if (!newType) return;
+
+    setBusinessTypes((prev) => {
+      const updatedTypes = [...prev, newType];
+      localStorage.setItem('businessTypes', JSON.stringify(updatedTypes)); // Save to localStorage
+      return updatedTypes;
+    });
+
+    // Also set selected value in form
+    setClientData((prev) => ({
+      ...prev,
+      business_type: newType,
+    }));
   };
 
   const [clientData, setClientData] = useState<ClientFormData>({
+    _id: '',
     name: '',
     email: '',
     vat_number: '',
@@ -80,66 +100,20 @@ const AddClients: React.FC = () => {
     ct_due_date: null,
     vat_due_date: null,
     trade_licence_expiry: null,
-    password_expiry: null,
-    emirate: '',
+    passport_expiry: null,
+    emirate_id_expiry: null,
     Revenue: '',
     contact_number: '',
     address: '',
     status: '',
   });
 
-  // const [open, setOpen] = useState(0);
-  // const [page, setPage] = useState(0);
-  // const [dates, setDates] = useState<(dayjs.Dayjs | null)[]>(Array(12).fill(null));
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
 
-  // const handleDateChange = (index: number, newValue: dayjs.Dayjs | null) => {
-  //   const updated = [...dates];
-  //   updated[index] = newValue;
-  //   setDates(updated);
-
-  //   const monthYearValues = updated.filter((d) => d !== null).map((d) => d?.format('MMMM YYYY')); // Format: e.g., July 2025
-
-  //   setClientData((prev) => ({
-  //     ...prev,
-  //     Revenue: monthYearValues.join(', '),
-  //   }));
-  // };
-
-  // const handleRevenueSave = () => {
-  //   const selectedDates = dates.filter((d) => d !== null);
-  //   const formatted = selectedDates.map((d) => d?.format('MMMM YYYY'));
-  //   const uniqueValues = [...new Set(formatted)];
-
-  //   setClientData((prev) => ({
-  //     ...prev,
-  //     Revenue: uniqueValues.join(', '),
-  //   }));
-
-  //   setOpen(0); // Close the dialog
-  // };
-
-  // const [open, setOpen] = useState<boolean>(false);
-
-  // const [page, setPage] = useState<number>(0);
-
-  // const handleRevenueSave = () => {
-  //   const combined = dates
-  //     .map((date, i) => {
-  //       if (!date) return null;
-  //       return `${date.format('MMMM YYYY')}: ${amounts[i]}`;
-  //     })
-  //     .filter(Boolean);
-
-  //   setClientData((prev) => ({
-  //     ...prev,
-  //     Revenue: combined.join(', '),
-  //   }));
-
-  //   setOpen(false); // Close dialog
-  // };
-
-  // const startIndex = open * 6;
-  // const visiblePickers = Array.from({ length: 6 }, (_, i) => startIndex + i);
+  const openRevenueDialog = (id: string) => {
+    setSelectedClientId(id);
+    setOpen(true);
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent,
@@ -152,18 +126,30 @@ const AddClients: React.FC = () => {
     }));
   };
 
+  const handleChanges = (e: SelectChangeEvent<string>) => {
+    const { name, value } = e.target;
+    setClientData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const formattedClientData = {
       ...clientData,
-      ct_due_date: clientData.ct_due_date ? clientData.ct_due_date.format('YYYY-MM-DD') : '',
-      vat_due_date: clientData.vat_due_date ? clientData.vat_due_date.format('YYYY-MM-DD') : '',
+      ct_due_date: clientData.ct_due_date ? clientData.ct_due_date.format('DD-MM-YYYY') : '',
+      vat_due_date: clientData.vat_due_date ? clientData.vat_due_date.format('DD-MM-YYYY') : '',
       trade_licence_expiry: clientData.trade_licence_expiry
-        ? clientData.trade_licence_expiry.format('YYYY-MM-DD')
+        ? clientData.trade_licence_expiry.format('DD-MM-YYYY')
         : '',
-      password_expiry: clientData.password_expiry
-        ? clientData.password_expiry.format('YYYY-MM-DD')
+      emirate_id_expiry: clientData.emirate_id_expiry
+        ? clientData.emirate_id_expiry.format('DD-MM-YYYY')
+        : '',
+
+      passport_expiry: clientData.passport_expiry
+        ? clientData.passport_expiry.format('DD-MM-YYYY')
         : '',
     };
 
@@ -176,7 +162,7 @@ const AddClients: React.FC = () => {
     }
   };
 
-  const [open, setOpen] = useState<boolean>(false);
+  const [open, setOpen] = useState(false);
   const [page, setPage] = useState<number>(0);
 
   // 24 months by default
@@ -196,26 +182,52 @@ const AddClients: React.FC = () => {
     setAmounts(updated);
   };
 
-  const handleRevenueSave = () => {
-    const combined = dates
+  const handleRevenueSave = async () => {
+    if (!selectedClientId) {
+      toast.error('Client ID not found. Save the client first.');
+      return;
+    }
+
+    const revenueData = dates
       .map((date, i) => {
         if (!date) return null;
-        return `${date.format('MMMM YYYY')}: ${amounts[i]}`;
+        return {
+          month: date.format('YYYY-MM'), // clean format
+          amount: parseFloat(amounts[i]) || 0,
+        };
       })
       .filter(Boolean);
 
-    setClientData((prev) => ({
-      ...prev,
-      Revenue: combined.join(', '),
-    }));
+    try {
+      const response = await axios.post(`/clients/${selectedClientId}/revenue`, {
+        revenue: revenueData,
+      });
 
-    setOpen(false);
+      if (response.status === 200) {
+        const summary = revenueData
+          .filter((item): item is { month: string; amount: number } => item !== null)
+          .map((item) => `${dayjs(item.month).format('MMMM YYYY')}: ${item.amount}`)
+          .join(', ');
+
+        setClientData((prev) => ({
+          ...prev,
+          Revenue: summary,
+        }));
+
+        toast.success('Revenue saved successfully!');
+        setOpen(false); // ✅ Close the dialog
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to save revenue. Please try again.');
+    }
   };
 
-  // Pagination logic
   const itemsPerPage = 6;
   const startIndex = page * itemsPerPage;
-  const visiblePickers = Array.from({ length: itemsPerPage }, (_, i) => startIndex + i);
+  const visiblePickers = Array.from({ length: itemsPerPage }, (_, i) => startIndex + i).filter(
+    (i) => i < dates.length,
+  );
 
   return (
     <Container maxWidth="xl">
@@ -279,11 +291,12 @@ const AddClients: React.FC = () => {
               <Typography variant="subtitle2" ml="4px" fontSize="16px">
                 Business Type
               </Typography>
+
               <FormControl fullWidth required>
                 <Select
                   displayEmpty
                   value={clientData.business_type}
-                  onChange={handleChange}
+                  onChange={handleChanges}
                   name="business_type"
                 >
                   <MenuItem value="" disabled>
@@ -446,8 +459,9 @@ const AddClients: React.FC = () => {
               </Typography>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
-                  // label="Upcoming CT Due Date"
-                  value={clientData.ct_due_date}
+                  value={
+                    clientData.ct_due_date ? dayjs(clientData.ct_due_date, 'DD-MM-YYYY') : null
+                  }
                   onChange={(newValue: Dayjs | null) =>
                     setClientData((prev) => ({
                       ...prev,
@@ -475,8 +489,9 @@ const AddClients: React.FC = () => {
               </Typography>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
-                  // label="Upcoming VAT Due Date"
-                  value={clientData.vat_due_date}
+                  value={
+                    clientData.vat_due_date ? dayjs(clientData.vat_due_date, 'DD-MM-YYYY') : null
+                  }
                   onChange={(newValue: Dayjs | null) =>
                     setClientData((prev) => ({
                       ...prev,
@@ -504,8 +519,11 @@ const AddClients: React.FC = () => {
               </Typography>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
-                  // label="Trade Licence Expiry Date"
-                  value={clientData.trade_licence_expiry}
+                  value={
+                    clientData.trade_licence_expiry
+                      ? dayjs(clientData.trade_licence_expiry, 'DD-MM-YYYY')
+                      : null
+                  }
                   onChange={(newValue: Dayjs | null) =>
                     setClientData((prev) => ({
                       ...prev,
@@ -529,27 +547,34 @@ const AddClients: React.FC = () => {
 
             <Grid item xs={12} sm={6}>
               <Typography variant="subtitle2" ml="4px" fontSize="16px">
-                Emirate ID
+                Emirate Expiry Date
               </Typography>
-              <TextField
-                // placeholder="Emirate ID"
-                variant="outlined"
-                fullWidth
-                type="text"
-                name="emirate"
-                value={clientData.emirate}
-                onChange={handleChange}
-                inputProps={{
-                  inputMode: 'numeric',
-                  pattern: '[0-9]*',
-                }}
-                required
-                InputProps={{
-                  style: {
-                    backgroundColor: theme.palette.info.main,
-                  },
-                }}
-              />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  value={
+                    clientData.emirate_id_expiry
+                      ? dayjs(clientData.emirate_id_expiry, 'DD-MM-YYYY')
+                      : null
+                  }
+                  onChange={(newValue: Dayjs | null) =>
+                    setClientData((prev) => ({
+                      ...prev,
+                      emirate_id_expiry: newValue,
+                    }))
+                  }
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      InputProps: {
+                        style: {
+                          color: '#3e4095',
+                          fontWeight: '500',
+                        },
+                      },
+                    },
+                  }}
+                />
+              </LocalizationProvider>
             </Grid>
 
             <Grid item xs={12} sm={6}>
@@ -558,12 +583,15 @@ const AddClients: React.FC = () => {
               </Typography>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
-                  // label="Passport Expiry Date"
-                  value={clientData.password_expiry}
+                  value={
+                    clientData.passport_expiry
+                      ? dayjs(clientData.passport_expiry, 'DD-MM-YYYY')
+                      : null
+                  }
                   onChange={(newValue: Dayjs | null) =>
                     setClientData((prev) => ({
                       ...prev,
-                      password_expiry: newValue,
+                      passport_expiry: newValue,
                     }))
                   }
                   slotProps={{
@@ -590,7 +618,10 @@ const AddClients: React.FC = () => {
                   name="Revenue"
                   // placeholder="Revenue"
                   value={clientData.Revenue}
-                  onClick={() => setOpen(true)}
+                  onClick={() => {
+                    setOpen(true);
+                    openRevenueDialog(clientData._id!);
+                  }}
                   fullWidth
                   variant="outlined"
                   InputProps={{
@@ -609,7 +640,7 @@ const AddClients: React.FC = () => {
                         <Grid item xs={6}>
                           <DatePicker
                             views={['year', 'month']}
-                            label={`Date ${index + 1}`}
+                            label={`Month ${index + 1}`}
                             value={dates[index]}
                             onChange={(newValue) => handleDateChange(index, newValue)}
                             format="MMMM YYYY"
@@ -620,13 +651,22 @@ const AddClients: React.FC = () => {
                             }}
                           />
                         </Grid>
+
                         <Grid item xs={6}>
                           <TextField
                             type="number"
-                            label="Amount"
+                            placeholder="Amount"
                             value={amounts[index]}
                             onChange={(e) => handleAmountChange(index, e.target.value)}
                             fullWidth
+                            sx={{
+                              '& .MuiInputBase-root': {
+                                height: 50,
+                              },
+                              '& .MuiInputLabel-root': {
+                                top: -6,
+                              },
+                            }}
                           />
                         </Grid>
                       </Grid>
@@ -661,7 +701,7 @@ const AddClients: React.FC = () => {
                   <Button
                     variant="outlined"
                     onClick={() => setPage(page + 1)}
-                    disabled={(page + 1) * 6 >= dates.length}
+                    disabled={(page + 1) * itemsPerPage >= dates.length}
                     sx={{
                       backgroundColor: 'primary.main',
                       color: '#fff',

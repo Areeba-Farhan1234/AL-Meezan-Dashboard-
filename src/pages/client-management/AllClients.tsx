@@ -16,14 +16,19 @@ import {
   Menu,
   MenuItem,
 } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import UploadIcon from '@mui/icons-material/Upload';
 import DownloadIcon from '@mui/icons-material/Download';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-// import { toast } from 'react-toastify';
+import dayjs from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { Dayjs } from 'dayjs';
 import 'react-toastify/dist/ReactToastify.css';
+import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { useClients, Client } from '../../context/ClientsContext';
 import axios from 'axios';
@@ -31,6 +36,7 @@ import axios from 'axios';
 const ClientsList: React.FC = () => {
   const { clients, updateClient, setClients } = useClients();
   const navigate = useNavigate();
+  const theme = useTheme();
   const [startY, setStartY] = useState(0);
   const [scrollTop, setScrollTop] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -41,12 +47,112 @@ const ClientsList: React.FC = () => {
   const [editedClient, setEditedClient] = useState<Partial<Client>>({});
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
-  // const fileInputRef = useRef<HTMLInputElement>(null);
   const open = Boolean(anchorEl);
+
   const [isOn, setIsOn] = useState(true);
 
-  const toggle = () => {
-    setIsOn((prev) => !prev);
+  const filteredClients = clients.filter((client) => {
+    const status = (client.status || '').toLowerCase().trim();
+    return isOn ? status === 'active' : status === 'inactive';
+  });
+
+  const [ShareholderOpen, setShareholderOpen] = useState(false);
+
+  type Shareholder = {
+    name: string;
+    id: string;
+    expiry: Dayjs | null;
+  };
+
+  const [shareholders, setShareholders] = useState<Shareholder[]>([
+    { name: '', id: '', expiry: null },
+  ]);
+
+  const handleShareholderChange = <K extends keyof Shareholder>(
+    index: number,
+    field: K,
+    value: Shareholder[K],
+  ) => {
+    const updated = [...shareholders];
+    updated[index][field] = value;
+    setShareholders(updated);
+  };
+
+  interface ShareholderFromBackend {
+    name: string;
+    id: string;
+    expiry?: string | null;
+  }
+
+  const handleOpenShareholderDialog = async (clientId: string) => {
+    setSelectedClientId(clientId);
+    try {
+      const res = await fetch(`/shareholders/${clientId}`);
+      if (!res.ok) {
+        throw new Error('Failed to fetch shareholders');
+      }
+      const data: ShareholderFromBackend[] = await res.json();
+
+      // Convert expiry string to dayjs or null
+      const processedData = data.map((s) => ({
+        ...s,
+        expiry: s.expiry ? dayjs(s.expiry) : null,
+      }));
+
+      setShareholders(processedData.length ? processedData : [{ name: '', id: '', expiry: null }]);
+    } catch (error) {
+      console.error('Error fetching shareholders:', error);
+      setShareholders([{ name: '', id: '', expiry: null }]);
+    }
+    setShareholderOpen(true);
+  };
+
+  const handleAddShareholder = () => {
+    const last = shareholders[shareholders.length - 1];
+    if (!last.name || !last.id || !last.expiry) {
+      alert('Please fill all fields before adding a new shareholder.');
+      return;
+    }
+    setShareholders([...shareholders, { name: '', id: '', expiry: null }]);
+  };
+
+  const handleSaveShareholders = async () => {
+    if (!selectedClientId) {
+      alert('No client selected!');
+      return;
+    }
+
+    try {
+      // Convert expiry Dayjs to string or null before sending
+      const payload = shareholders.map((sh) => ({
+        ...sh,
+        expiry: sh.expiry ? sh.expiry.toISOString() : null,
+      }));
+
+      const response = await fetch(`/shareholders/${selectedClientId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save shareholders');
+      }
+
+      const data: ShareholderFromBackend[] = await response.json();
+
+      // Process returned data (convert expiry string to dayjs)
+      const processedData = data.map((s) => ({
+        ...s,
+        expiry: s.expiry ? dayjs(s.expiry) : null,
+      }));
+
+      setShareholders(processedData);
+      setShareholderOpen(false); // close dialog after successful save
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error saving shareholders');
+    }
   };
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>, id: string) => {
@@ -58,96 +164,6 @@ const ClientsList: React.FC = () => {
     setAnchorEl(null);
     setSelectedClientId(null);
   };
-
-  // const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = event.target.files?.[0];
-  //   if (!file || !selectedClientId) return;
-
-  //   const formData = new FormData();
-  //   formData.append('file', file);
-
-  //   axios
-  //     .post(`/clients/${selectedClientId}/upload`, formData)
-  //     .then(() => {
-  //       toast.success('File uploaded successfully 🎉');
-  //     })
-  //     .catch(() => {
-  //       toast.error('Upload failed ❌');
-  //     })
-  //     .finally(() => {
-  //       handleCloseMenu();
-  //     });
-  // };
-
-  // const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const files = event.target.files;
-  //   if (!files || !selectedClientId) return;
-
-  //   const formData = new FormData();
-  //   Array.from(files).forEach((file) => {
-  //     formData.append('files', file); // must match backend field name
-  //   });
-
-  //   axios
-  //     .post(`/clients/${selectedClientId}/upload`, formData)
-  //     .then(() => {
-  //       toast.success('Files uploaded successfully 🎉');
-  //       fetchClientFiles(selectedClientId); // refresh list
-  //     })
-  //     .catch(() => {
-  //       toast.error('Upload failed ❌');
-  //     })
-  //     .finally(() => {
-  //       handleCloseMenu();
-  //     });
-  // };
-
-  // const [clientFiles, setClientFiles] = useState<{ name: string }[]>([]);
-
-  // const fetchClientFiles = async (id: string) => {
-  //   try {
-  //     const res = await axios.get(`/clients/${id}/files`);
-  //     setClientFiles(res.data.files); // [{ name: "file1.pdf" }, ...]
-  //   } catch (err) {
-  //     toast.error('Failed to load files');
-  //   }
-  // };
-
-  // const handleFileDownload = () => {
-  //   if (!selectedClientId) return;
-
-  //   axios
-  //     .get(`/clients/${selectedClientId}/download`, { responseType: 'blob' })
-  //     .then((res) => {
-  //       const url = window.URL.createObjectURL(new Blob([res.data]));
-  //       const link = document.createElement('a');
-  //       link.href = url;
-  //       link.setAttribute('download', 'client_file.pdf');
-  //       document.body.appendChild(link);
-  //       link.click();
-  //       toast.success('File downloaded 🎉');
-  //     })
-  //     .catch(() => toast.error('Download failed ❌'))
-  //     .finally(() => handleCloseMenu());
-  // };
-
-  // const handleFileDownloadAll = () => {
-  //   if (!selectedClientId) return;
-
-  //   axios
-  //     .get(`/clients/${selectedClientId}/download-all`, { responseType: 'blob' })
-  //     .then((res) => {
-  //       const url = window.URL.createObjectURL(new Blob([res.data]));
-  //       const link = document.createElement('a');
-  //       link.href = url;
-  //       link.setAttribute('download', `client_${selectedClientId}_files.zip`);
-  //       document.body.appendChild(link);
-  //       link.click();
-  //       toast.success('All files downloaded 🎉');
-  //     })
-  //     .catch(() => toast.error('Download failed ❌'))
-  //     .finally(() => handleCloseMenu());
-  // };
 
   const onMouseLeave = () => {
     setIsDragging(false);
@@ -222,10 +238,11 @@ const ClientsList: React.FC = () => {
     { key: 'ct_due_date', label: 'CT Due' },
     { key: 'vat_due_date', label: 'VAT Due' },
     { key: 'trade_licence_expiry', label: 'Licence Expiry' },
-    { key: 'emirate', label: 'Emirate ID' },
-    { key: 'password_expiry', label: 'Password Expiry' },
+    { key: 'emirate_id_expiry', label: 'Emirate Expiry' },
+    { key: 'passport_expiry', label: 'Passport Expiry' },
     { key: 'contact_number', label: 'Contact' },
     { key: 'address', label: 'Address', align: 'left' },
+    { key: 'Revenue', label: 'Revenue' },
     { key: 'status', label: 'Status' },
   ];
 
@@ -258,18 +275,19 @@ const ClientsList: React.FC = () => {
             {/* Right Side: Toggle */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Typography variant="subtitle1">
-                {isOn ? 'Active Clients' : 'Inactive Clients'}
+                {isOn ? 'Active Clients' : 'InActive Clients'}
               </Typography>
 
               <Box
-                onClick={toggle}
+                onClick={() => setIsOn(!isOn)}
                 sx={{
-                  width: '60px',
+                  width: '80px',
                   height: '32px',
                   borderRadius: '999px',
                   backgroundColor: isOn ? '#3e4595' : '#e0e0e0',
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: isOn ? 'flex-end' : 'flex-start',
                   padding: '4px',
                   cursor: 'pointer',
                   boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
@@ -281,8 +299,7 @@ const ClientsList: React.FC = () => {
                     width: '24px',
                     height: '24px',
                     borderRadius: '50%',
-                    backgroundColor: '#ccc',
-                    transform: isOn ? 'translateX(28px)' : 'translateX(0)',
+                    backgroundColor: '#fff',
                     transition: 'transform 0.3s',
                   }}
                 />
@@ -290,8 +307,8 @@ const ClientsList: React.FC = () => {
             </Box>
           </Box>
         </Grid>
-
-        {clients.length > 0 ? (
+        {filteredClients.length > 0 ? (
+          // {clients.length > 0 ? (
           <>
             <Box
               ref={containerRef}
@@ -403,7 +420,8 @@ const ClientsList: React.FC = () => {
                   </TableHead>
 
                   <TableBody>
-                    {clients.map((client) => {
+                    {filteredClients.map((client) => {
+                      // {clients.map((client) => {
                       const isEditing = editingClientId === client._id;
 
                       return (
@@ -416,12 +434,68 @@ const ClientsList: React.FC = () => {
                           }}
                         >
                           {fields.map(({ key, align }) => {
+                            // Password field (read-only if not editing)
                             if (key === 'password' && !isEditing) {
                               return (
                                 <TableCell
                                   key={key}
                                   align={align || 'center'}
                                   sx={{ padding: '6px 16px', whiteSpace: 'nowrap' }}
+                                >
+                                  {client[key]}
+                                </TableCell>
+                              );
+                            }
+
+                            // Name field – clickable for dialog
+                            if (key === 'passport_expiry') {
+                              return (
+                                <TableCell
+                                  key={key}
+                                  align={align || 'left'}
+                                  sx={{
+                                    ...commonCellStyles,
+                                    color: '#3e4095',
+                                    fontWeight: '500',
+                                  }}
+                                  // onClick={() => {
+                                  //   setShareholders([
+                                  //     {
+                                  //       name: client.name,
+                                  //       id: client._id ?? '',
+                                  //       expiry: null,
+                                  //     },
+                                  //   ]);
+                                  //   setShareholderOpen(true);
+                                  // }}
+                                  onClick={() => handleOpenShareholderDialog(client._id)}
+                                >
+                                  {client[key]}
+                                </TableCell>
+                              );
+                            }
+
+                            if (key === 'emirate_id_expiry') {
+                              return (
+                                <TableCell
+                                  key={key}
+                                  align={align || 'left'}
+                                  sx={{
+                                    ...commonCellStyles,
+                                    color: '#3e4095',
+                                    fontWeight: '500',
+                                  }}
+                                  // onClick={() => {
+                                  //   setShareholders([
+                                  //     {
+                                  //       name: client.name,
+                                  //       id: client._id ?? '',
+                                  //       expiry: null,
+                                  //     },
+                                  //   ]);
+                                  //   setShareholderOpen(true);
+                                  // }}
+                                  onClick={() => handleOpenShareholderDialog(client._id)}
                                 >
                                   {client[key]}
                                 </TableCell>
@@ -466,12 +540,14 @@ const ClientsList: React.FC = () => {
                             );
                           })}
 
+                          {/* Files menu button */}
                           <TableCell align="center" sx={{ ...commonCellStyles }}>
                             <IconButton onClick={(e) => handleMenuClick(e, String(client._id))}>
                               <MoreVertIcon />
                             </IconButton>
                           </TableCell>
 
+                          {/* Actions: Edit/Delete or Save/Cancel */}
                           <TableCell align="center" sx={{ ...commonCellStyles }}>
                             {isEditing ? (
                               <>
@@ -533,40 +609,6 @@ const ClientsList: React.FC = () => {
             Add Client
           </Button>
         </Box>
-        {/* <Menu anchorEl={anchorEl} open={open} onClose={handleCloseMenu}>
-          <MenuItem onClick={() => fileInputRef.current?.click()}>
-            <UploadIcon fontSize="small" sx={{ mr: 1 }} />
-            Upload
-          </MenuItem>
-          <MenuItem onClick={handleFileDownload}>
-            <DownloadIcon fontSize="small" sx={{ mr: 1 }} />
-            Download
-          </MenuItem>
-        </Menu> */}
-
-        {/* <Menu anchorEl={anchorEl} open={open} onClose={handleCloseMenu}>
-          <MenuItem onClick={() => fileInputRef.current?.click()}>
-            <UploadIcon fontSize="small" sx={{ mr: 1 }} />
-            Upload Files
-          </MenuItem>
-          <MenuItem> onClick={handleFileDownloadAll}
-            <DownloadIcon fontSize="small" sx={{ mr: 1 }} />
-            Download All
-          </MenuItem>
-          <MenuItem >  onClick={() => selectedClientId && fetchClientFiles(selectedClientId)}
-            📂 View Files
-          </MenuItem>
-        </Menu>
-
-        <input
-          title="file"
-          type="file"
-          ref={fileInputRef}
-          onChange={handleFileUpload}
-          accept=".pdf,.doc,.docx,.jpg,.png,.xlsx"
-          multiple
-          hidden
-        /> */}
 
         <Menu anchorEl={anchorEl} open={open} onClose={handleCloseMenu}>
           <MenuItem>
@@ -582,6 +624,130 @@ const ClientsList: React.FC = () => {
             View Files
           </MenuItem>
         </Menu>
+
+        <Dialog
+          open={ShareholderOpen}
+          onClose={() => setShareholderOpen(false)}
+          fullWidth
+          maxWidth="lg"
+        >
+          <DialogTitle>Add Client Details</DialogTitle>
+          <DialogContent dividers>
+            {shareholders.map((sh, index) => (
+              <Grid container spacing={2} key={index} sx={{ mb: 2 }}>
+                <Grid item xs={4}>
+                  <Typography variant="subtitle2" ml="4px" fontSize="16px">
+                    Client Name
+                  </Typography>
+                  <TextField
+                    value={sh.name}
+                    onChange={(e) => handleShareholderChange(index, 'name', e.target.value)}
+                    fullWidth
+                    InputProps={{
+                      style: { backgroundColor: theme.palette.info.main, height: '50px' },
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={4}>
+                  <Typography variant="subtitle2" ml="4px" fontSize="16px">
+                    Client ID
+                  </Typography>
+                  <TextField
+                    value={sh.id}
+                    onChange={(e) => handleShareholderChange(index, 'id', e.target.value)}
+                    fullWidth
+                    InputProps={{
+                      style: { backgroundColor: theme.palette.info.main, height: '50px' },
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={4}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <Typography variant="subtitle2" ml="4px" fontSize="16px">
+                      Expiry Date
+                    </Typography>
+                    {/* <DatePicker
+                      value={sh.expiry}
+                      onChange={(newDate) => handleShareholderChange(index, 'expiry', newDate)}
+                      views={['day', 'month', 'year']}
+                      slotProps={{ textField: { fullWidth: true } }}
+                    /> */}
+
+                    <DatePicker
+                      value={sh.expiry}
+                      onChange={(newDate) => handleShareholderChange(index, 'expiry', newDate)}
+                      views={['day', 'month', 'year']}
+                      slotProps={{ textField: { fullWidth: true } }}
+                    />
+                  </LocalizationProvider>
+                </Grid>
+              </Grid>
+            ))}
+
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={handleAddShareholder}
+              sx={{
+                backgroundColor: 'primary.main',
+                color: '#fff',
+                '&:hover': {
+                  backgroundColor: '#fff',
+                  color: 'primary.main',
+                  border: '2px solid',
+                  borderColor: 'primary.main',
+                  boxShadow: 4,
+                },
+              }}
+            >
+              Add New Shareholder
+            </Button>
+          </DialogContent>
+
+          <DialogActions>
+            <Button
+              onClick={() => setShareholderOpen(false)}
+              variant="outlined"
+              color="primary"
+              sx={{
+                backgroundColor: 'primary.main',
+                color: '#fff',
+                '&:hover': {
+                  backgroundColor: '#fff',
+                  color: 'primary.main',
+                  border: '2px solid',
+                  borderColor: 'primary.main',
+                  boxShadow: 4,
+                },
+              }}
+            >
+              Close
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              // onClick={() => {
+              //   console.log('Saving shareholders:', shareholders);
+              //   handleSaveShareholders();
+              // }}
+
+              onClick={handleSaveShareholders}
+              sx={{
+                backgroundColor: 'primary.main',
+                color: '#fff',
+                '&:hover': {
+                  backgroundColor: '#fff',
+                  color: 'primary.main',
+                  border: '2px solid',
+                  borderColor: 'primary.main',
+                  boxShadow: 4,
+                },
+              }}
+            >
+              Save
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </Container>
   );

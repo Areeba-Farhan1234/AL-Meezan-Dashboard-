@@ -26,6 +26,8 @@ export default defineConfig({
       '/documents': 'http://localhost:5000',
       '/sendEmail': 'http://localhost:5000',
       '/kyc': 'http://localhost:5000',
+      '/business-types': 'http://localhost:5000',
+      '/shareholders': 'http://localhost:5000',
     },
   },
   preview: {

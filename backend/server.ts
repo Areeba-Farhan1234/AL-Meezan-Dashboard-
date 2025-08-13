@@ -77,6 +77,8 @@ import kycRoutes from './routes/kyc';
 import VatClient from './models/VATClients';
 import VatDeregistration from './models/VATdereg';
 import VatRefund from './models/VATrefund';
+import businessTypeRoutes from './routes/businessType';
+import shareholderRoutes from './routes/shareholders';
 
 dotenv.config();
 
@@ -125,6 +127,8 @@ app.use('/refund', refundRoutes);
 app.use('/documents', documentRoutes);
 app.use('/sendEmail', sendEmailRoutes);
 app.use('/kyc', kycRoutes);
+app.use('/business-types', businessTypeRoutes);
+app.use('/shareholders', shareholderRoutes);
 
 // ===== VAT Registration GET & POST =====
 app.get('/vat', async (_req: Request, res: Response) => {
