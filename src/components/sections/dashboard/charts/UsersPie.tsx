@@ -11,11 +11,11 @@ const VatFormsPie: React.FC = () => {
   const { clients } = useVatReg(); // Registration forms
   const { vatDeregList } = useVatDereg(); // Deregistration forms
   const { reports } = useRefundContext(); // Refund reports
-  console.log('VAT Refund reports length:', reports.length); // ✅ DEBUG
+  // console.log('VAT Refund reports length:', reports.length); // ✅ DEBUG
   const pieData = [
     { name: 'VAT Registration Forms', value: clients.length },
     { name: 'VAT Deregistration Forms', value: vatDeregList.length },
-    { name: 'VAT Refund Forms', value: 6 },
+    { name: 'VAT Refund Forms', value: reports.length },
   ];
 
   return (
